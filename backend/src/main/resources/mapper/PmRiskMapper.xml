@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pms.mapper.PmRiskMapper">
+  <resultMap id="BaseResultMap" type="com.pms.entity.PmRisk">
+    <id column="id" property="id"/>
+    <result column="project_id" property="projectId"/>
+    <result column="risk_code" property="riskCode"/>
+    <result column="title" property="title"/>
+    <result column="description" property="description"/>
+    <result column="probability" property="probability"/>
+    <result column="impact" property="impact"/>
+    <result column="risk_level" property="riskLevel"/>
+    <result column="response" property="response"/>
+    <result column="owner_id" property="ownerId"/>
+    <result column="status" property="status"/>
+    <result column="created_by" property="createdBy"/>
+    <result column="created_at" property="createdAt"/>
+    <result column="updated_at" property="updatedAt"/>
+  </resultMap>
+  <sql id="wherePage">
+    <where>
+      <if test="projectId != null">AND project_id = #{projectId}</if>
+      <if test="status != null and status != ''">AND status = #{status}</if>
+    </where>
+  </sql>
+  <select id="selectPage" resultMap="BaseResultMap">
+    SELECT * FROM pm_risk <include refid="wherePage"/> ORDER BY id DESC LIMIT #{offset}, #{limit}
+  </select>
+  <select id="countPage" resultType="long">SELECT COUNT(*) FROM pm_risk <include refid="wherePage"/></select>
+  <select id="selectById" resultMap="BaseResultMap">SELECT * FROM pm_risk WHERE id = #{id}</select>
+  <select id="selectMaxRiskCode" resultType="string">SELECT MAX(risk_code) FROM pm_risk</select>
+  <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO pm_risk (project_id, risk_code, title, description, probability, impact, risk_level, response, owner_id, status, created_by)
+    VALUES (#{projectId}, #{riskCode}, #{title}, #{description}, #{probability}, #{impact}, #{riskLevel}, #{response}, #{ownerId}, #{status}, #{createdBy})
+  </insert>
+  <update id="updateById">
+    UPDATE pm_risk SET project_id=#{projectId}, risk_code=#{riskCode}, title=#{title}, description=#{description}, probability=#{probability}, impact=#{impact}, risk_level=#{riskLevel}, response=#{response}, owner_id=#{ownerId}, status=#{status} WHERE id = #{id}
+  </update>
+  <delete id="deleteById">DELETE FROM pm_risk WHERE id = #{id}</delete>
+</mapper>

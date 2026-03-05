@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pms.mapper.PmCostMapper">
+  <resultMap id="BaseResultMap" type="com.pms.entity.PmCost">
+    <id column="id" property="id"/>
+    <result column="project_id" property="projectId"/>
+    <result column="task_id" property="taskId"/>
+    <result column="cost_type" property="costType"/>
+    <result column="budget_amount" property="budgetAmount"/>
+    <result column="actual_amount" property="actualAmount"/>
+    <result column="occur_date" property="occurDate"/>
+    <result column="remark" property="remark"/>
+    <result column="created_by" property="createdBy"/>
+    <result column="created_at" property="createdAt"/>
+    <result column="updated_at" property="updatedAt"/>
+  </resultMap>
+  <sql id="wherePage">
+    <where>
+      <if test="projectId != null">AND project_id = #{projectId}</if>
+    </where>
+  </sql>
+  <select id="selectPage" resultMap="BaseResultMap">
+    SELECT * FROM pm_cost <include refid="wherePage"/> ORDER BY id DESC LIMIT #{offset}, #{limit}
+  </select>
+  <select id="countPage" resultType="long">SELECT COUNT(*) FROM pm_cost <include refid="wherePage"/></select>
+  <select id="selectById" resultMap="BaseResultMap">SELECT * FROM pm_cost WHERE id = #{id}</select>
+  <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO pm_cost (project_id, task_id, cost_type, budget_amount, actual_amount, occur_date, remark, created_by)
+    VALUES (#{projectId}, #{taskId}, #{costType}, #{budgetAmount}, #{actualAmount}, #{occurDate}, #{remark}, #{createdBy})
+  </insert>
+  <update id="updateById">
+    UPDATE pm_cost SET project_id=#{projectId}, task_id=#{taskId}, cost_type=#{costType}, budget_amount=#{budgetAmount}, actual_amount=#{actualAmount}, occur_date=#{occurDate}, remark=#{remark} WHERE id = #{id}
+  </update>
+  <delete id="deleteById">DELETE FROM pm_cost WHERE id = #{id}</delete>
+</mapper>

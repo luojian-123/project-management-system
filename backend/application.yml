@@ -1,0 +1,39 @@
+spring:
+  application:
+    name: pms-backend
+  datasource:
+    url: jdbc:mysql://localhost:3306/pms?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false
+    username: root
+    password: 12345678
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: Asia/Shanghai
+
+mybatis:
+  mapper-locations: classpath:mapper/**/*.xml
+  type-aliases-package: com.pms.entity
+  configuration:
+    map-underscore-to-camel-case: true
+
+server:
+  port: 8080
+  address: 0.0.0.0
+  servlet:
+    context-path: /api
+
+# JWT
+jwt:
+  secret: pms-jwt-secret-key-at-least-256-bits-for-hs256-please-change-in-production
+  expiration-ms: 86400000
+
+# 金蝶集成（预留，请勿将真实密钥提交到代码库）
+# 使用前需确认金蝶产品、开放接口文档及鉴权方式
+kingdee:
+  enabled: false
+  base-url: https://your-kingdee-domain.com
+  app-id: ""
+  app-secret: ""
+  # 可选：数据中心 ID、语言等，按金蝶云·星空等产品文档填写
+  # acct-id: ""
+  # lcid: 2052

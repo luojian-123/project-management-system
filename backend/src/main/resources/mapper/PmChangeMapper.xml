@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pms.mapper.PmChangeMapper">
+  <resultMap id="BaseResultMap" type="com.pms.entity.PmChange">
+    <id column="id" property="id"/>
+    <result column="project_id" property="projectId"/>
+    <result column="change_no" property="changeNo"/>
+    <result column="title" property="title"/>
+    <result column="description" property="description"/>
+    <result column="change_type" property="changeType"/>
+    <result column="impact_scope" property="impactScope"/>
+    <result column="status" property="status"/>
+    <result column="applicant_id" property="applicantId"/>
+    <result column="apply_time" property="applyTime"/>
+    <result column="flow_id" property="flowId"/>
+    <result column="created_at" property="createdAt"/>
+    <result column="updated_at" property="updatedAt"/>
+  </resultMap>
+  <sql id="wherePage">
+    <where>
+      <if test="projectId != null">AND project_id = #{projectId}</if>
+      <if test="status != null and status != ''">AND status = #{status}</if>
+    </where>
+  </sql>
+  <select id="selectPage" resultMap="BaseResultMap">
+    SELECT * FROM pm_change <include refid="wherePage"/> ORDER BY id DESC LIMIT #{offset}, #{limit}
+  </select>
+  <select id="countPage" resultType="long">SELECT COUNT(*) FROM pm_change <include refid="wherePage"/></select>
+  <select id="selectById" resultMap="BaseResultMap">SELECT * FROM pm_change WHERE id = #{id}</select>
+  <select id="selectMaxChangeNo" resultType="string">SELECT MAX(change_no) FROM pm_change</select>
+  <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO pm_change (project_id, change_no, title, description, change_type, impact_scope, status, applicant_id, apply_time, flow_id)
+    VALUES (#{projectId}, #{changeNo}, #{title}, #{description}, #{changeType}, #{impactScope}, #{status}, #{applicantId}, #{applyTime}, #{flowId})
+  </insert>
+  <update id="updateById">
+    UPDATE pm_change SET project_id=#{projectId}, change_no=#{changeNo}, title=#{title}, description=#{description}, change_type=#{changeType}, impact_scope=#{impactScope}, status=#{status}, applicant_id=#{applicantId}, apply_time=#{applyTime}, flow_id=#{flowId} WHERE id = #{id}
+  </update>
+  <delete id="deleteById">DELETE FROM pm_change WHERE id = #{id}</delete>
+</mapper>
