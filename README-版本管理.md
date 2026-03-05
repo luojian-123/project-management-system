@@ -1,28 +1,15 @@
 # 项目版本管理说明
 
-**本仓库路径**：`D:\PMS系统代码\代码仓`  
-**Git 程序路径**：`D:\PMS系统代码\git`（使用前可将 `D:\PMS系统代码\git\bin` 加入系统 PATH，或直接用完整路径调用）
+## 一、初始化 Git 仓库（仅需一次）
 
-## 一、初始化（已完成）
+在项目根目录 `project-management-system` 下打开终端，执行：
 
-仓库已初始化并完成首次提交与标签 `v1.0.0`。无需再次执行 `git init`。
+```bash
+cd C:\Users\lj\project-management-system
+git init
+```
 
 ## 二、日常提交
-
-在 `D:\PMS系统代码\代码仓` 下打开终端。若未将 Git 加入 PATH，请使用完整路径：
-
-```bash
-cd D:\PMS系统代码\代码仓
-D:\PMS系统代码\git\bin\git.exe status
-```
-
-或先设置 PATH 后直接使用 `git`：
-
-```bash
-$env:Path = "D:\PMS系统代码\git\bin;" + $env:Path
-cd D:\PMS系统代码\代码仓
-git status
-```
 
 ```bash
 # 查看修改
@@ -70,17 +57,36 @@ git reset --hard <提交hash>
 git checkout v1.0.0
 ```
 
-## 五、远程备份（可选）
+## 五、部署到远程（GitHub / Gitee）
 
-若使用 GitHub / Gitee / 公司 Git 服务器：
+### 1. 在网站上创建仓库
+
+- **GitHub**：https://github.com/new → 仓库名如 `project-management-system`，不勾选「Initialize with README」
+- **Gitee**：https://gitee.com/projects/new → 同上
+
+### 2. 关联并推送
+
+在项目根目录执行（把 `<远程仓库地址>` 换成你的实际地址）：
 
 ```bash
 # 添加远程仓库
 git remote add origin <远程仓库地址>
+# 示例：git remote add origin https://github.com/你的用户名/project-management-system.git
 
-# 首次推送并带上标签
-git push -u origin main
-git push origin --tags
+# 当前分支为 master，首次推送并设置上游
+git push -u origin master
+
+# 若远程默认分支是 main，可先改本地分支名再推送：
+# git branch -M main
+# git push -u origin main
+```
+
+### 3. 之后日常推送
+
+```bash
+git add .
+git commit -m "本次修改说明"
+git push
 ```
 
 ## 六、.gitignore 说明
