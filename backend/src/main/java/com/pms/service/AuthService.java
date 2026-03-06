@@ -74,6 +74,20 @@ public class AuthService {
         userMapper.insert(user);
     }
 
+    /** 修改密码：校验原密码后更新为新密码 */
+    public void changePassword(Long userId, String oldPassword, String newPassword) {
+        if (newPassword == null || newPassword.trim().length() < 6) {
+            throw new RuntimeException("新密码至少6位");
+        }
+        SysUser user = userMapper.selectById(userId);
+        if (user == null) throw new RuntimeException("用户不存在");
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+            throw new RuntimeException("原密码错误");
+        }
+        user.setPassword(passwordEncoder.encode(newPassword.trim()));
+        userMapper.updateById(user);
+    }
+
     private List<Map<String, Object>> buildMenuTree(List<SysMenu> menus, Long parentId) {
         return menus.stream()
                 .filter(m -> (m.getParentId() == null && parentId == 0L) || (m.getParentId() != null && m.getParentId().equals(parentId)))

@@ -8,4 +8,6 @@ public class SysRole {
     private String code;
     private String name;
     private Integer status;
+    private Long deptId;
+    private Integer sortOrder;
 }

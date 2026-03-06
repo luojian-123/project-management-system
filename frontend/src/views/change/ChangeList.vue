@@ -1,8 +1,9 @@
 <template>
-  <el-card>
+  <div class="page">
+    <el-card>
     <template #header>
       <span>变更管理</span>
-      <el-button type="primary" style="float:right" @click="openForm()">新增</el-button>
+      <el-button type="primary" @click="openForm()">新增</el-button>
     </template>
     <el-table v-loading="loading" :data="list" stripe>
       <el-table-column label="标题" min-width="160">
@@ -12,7 +13,9 @@
       </el-table-column>
       <el-table-column prop="projectId" label="项目ID" width="90" />
       <el-table-column prop="changeType" label="类型" width="100" />
-      <el-table-column prop="status" label="状态" width="90" />
+      <el-table-column label="状态" width="90">
+        <template #default="{ row }">{{ changeStatusMap[row?.status] ?? row?.status ?? '-' }}</template>
+      </el-table-column>
       <el-table-column prop="createdAt" label="创建时间" width="170" />
       <el-table-column label="操作" width="80" fixed="right" align="center">
         <template #default="{ row }">
@@ -62,7 +65,8 @@
         <el-button type="primary" :loading="submitLoading" @click="submitForm">确定</el-button>
       </template>
     </el-dialog>
-  </el-card>
+    </el-card>
+  </div>
 </template>
 
 <script setup>
@@ -72,6 +76,7 @@ import { ArrowDown } from '@element-plus/icons-vue'
 import { changePage, changeSave, changeUpdate, changeDelete } from '@/api/change'
 
 const loading = ref(false)
+const changeStatusMap = { pending: '待审批', approved: '已通过', rejected: '已拒绝' }
 const list = ref([])
 const total = ref(0)
 const page = ref(1)

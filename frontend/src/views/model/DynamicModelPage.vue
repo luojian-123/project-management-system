@@ -3,7 +3,7 @@
     <el-card v-loading="configLoading">
       <template v-if="formConfig" #header>
         <span>{{ formConfig.formName }}</span>
-        <el-button type="primary" style="float:right" @click="openForm()">新增</el-button>
+        <el-button type="primary" @click="openForm()">新增</el-button>
       </template>
       <template v-if="!formConfig && !configLoading">
         <el-empty description="未找到该对象的表单配置，请在系统配置-表单配置中维护表单编码与接口路径" />

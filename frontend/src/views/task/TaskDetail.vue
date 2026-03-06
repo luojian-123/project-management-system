@@ -3,7 +3,7 @@
     <el-card v-loading="loading">
       <template #header>
         <span>任务详情</span>
-        <el-button type="primary" style="float:right" @click="goBack">返回</el-button>
+        <el-button type="primary" @click="goBack">返回</el-button>
       </template>
       <div v-if="detail">
         <el-descriptions :column="2" border>

@@ -1,8 +1,9 @@
 <template>
-  <el-card>
+  <div class="page">
+    <el-card>
     <template #header>
       <span>成本管理</span>
-      <el-button type="primary" style="float:right" @click="openForm()">新增</el-button>
+      <el-button type="primary" @click="openForm()">新增</el-button>
     </template>
     <el-table v-loading="loading" :data="list" stripe>
       <el-table-column label="成本类型/备注" min-width="140">
@@ -65,7 +66,8 @@
         <el-button type="primary" :loading="submitLoading" @click="submitForm">确定</el-button>
       </template>
     </el-dialog>
-  </el-card>
+    </el-card>
+  </div>
 </template>
 
 <script setup>

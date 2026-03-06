@@ -14,8 +14,32 @@
   </resultMap>
   <select id="selectByUsername" resultMap="BaseResultMap">SELECT * FROM sys_user WHERE username = #{username}</select>
   <select id="selectById" resultMap="BaseResultMap">SELECT * FROM sys_user WHERE id = #{id}</select>
+  <select id="selectPage" resultMap="BaseResultMap">
+    SELECT * FROM sys_user
+    <where>
+      <if test="keyword != null and keyword != ''">
+        AND (username LIKE CONCAT('%', #{keyword}, '%') OR real_name LIKE CONCAT('%', #{keyword}, '%'))
+      </if>
+    </where>
+    ORDER BY id DESC LIMIT #{offset}, #{limit}
+  </select>
+  <select id="countPage" resultType="long">
+    SELECT COUNT(*) FROM sys_user
+    <where>
+      <if test="keyword != null and keyword != ''">
+        AND (username LIKE CONCAT('%', #{keyword}, '%') OR real_name LIKE CONCAT('%', #{keyword}, '%'))
+      </if>
+    </where>
+  </select>
   <insert id="insert" useGeneratedKeys="true" keyProperty="id">
     INSERT INTO sys_user (username, password, real_name, email, phone, status)
     VALUES (#{username}, #{password}, #{realName}, #{email}, #{phone}, #{status})
   </insert>
+  <update id="updateById">
+    UPDATE sys_user
+    SET username=#{username}, real_name=#{realName}, email=#{email}, phone=#{phone}, status=#{status}
+    <if test="password != null and password != ''">, password=#{password}</if>
+    WHERE id = #{id}
+  </update>
+  <delete id="deleteById">DELETE FROM sys_user WHERE id = #{id}</delete>
 </mapper>

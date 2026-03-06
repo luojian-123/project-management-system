@@ -23,6 +23,30 @@ public class InitDataRunner implements CommandLineRunner {
     @Override
     public void run(String[] args) {
         jdbcTemplate.execute(
+            "CREATE TABLE IF NOT EXISTS pm_company (" +
+            "id BIGINT AUTO_INCREMENT PRIMARY KEY," +
+            "company_code VARCHAR(64)," +
+            "company_name VARCHAR(128) NOT NULL," +
+            "sort_order INT DEFAULT 0," +
+            "created_at DATETIME DEFAULT CURRENT_TIMESTAMP," +
+            "updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP" +
+            ")"
+        );
+        jdbcTemplate.execute(
+            "CREATE TABLE IF NOT EXISTS pm_dept (" +
+            "id BIGINT AUTO_INCREMENT PRIMARY KEY," +
+            "company_id BIGINT NOT NULL," +
+            "dept_code VARCHAR(64)," +
+            "dept_name VARCHAR(128) NOT NULL," +
+            "sort_order INT DEFAULT 0," +
+            "created_at DATETIME DEFAULT CURRENT_TIMESTAMP," +
+            "updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP" +
+            ")"
+        );
+        try { jdbcTemplate.execute("ALTER TABLE sys_role ADD COLUMN dept_id BIGINT NULL"); } catch (Exception ignored) {}
+        try { jdbcTemplate.execute("ALTER TABLE sys_role ADD COLUMN sort_order INT DEFAULT 0"); } catch (Exception ignored) {}
+
+        jdbcTemplate.execute(
             "CREATE TABLE IF NOT EXISTS pm_task (" +
             "id BIGINT AUTO_INCREMENT PRIMARY KEY," +
             "project_id BIGINT NOT NULL," +

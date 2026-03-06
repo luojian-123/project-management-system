@@ -43,4 +43,15 @@ public class AuthController {
         authService.register(username, password, realName);
         return Result.ok();
     }
+
+    @PutMapping("/password")
+    public Result<Void> changePassword(@RequestBody Map<String, String> body) {
+        Long userId = WebConfig.getCurrentUserId();
+        if (userId == null) return Result.fail("未登录");
+        String oldPassword = body.get("oldPassword");
+        String newPassword = body.get("newPassword");
+        if (oldPassword == null || newPassword == null) return Result.fail("原密码和新密码不能为空");
+        authService.changePassword(userId, oldPassword, newPassword);
+        return Result.ok();
+    }
 }

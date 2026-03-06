@@ -1,5 +1,6 @@
 <template>
-  <el-card>
+  <div class="page">
+    <el-card>
     <template #header>
       <div class="card-header">
         <div>
@@ -99,7 +100,8 @@
         <el-button type="primary" :loading="submitLoading" @click="submitForm">确定</el-button>
       </template>
     </el-dialog>
-  </el-card>
+    </el-card>
+  </div>
 </template>
 
 <script setup>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pms.mapper.PmDeptMapper">
+  <resultMap id="BaseResultMap" type="com.pms.entity.PmDept">
+    <id column="id" property="id"/>
+    <result column="company_id" property="companyId"/>
+    <result column="dept_code" property="deptCode"/>
+    <result column="dept_name" property="deptName"/>
+    <result column="sort_order" property="sortOrder"/>
+    <result column="created_at" property="createdAt"/>
+    <result column="updated_at" property="updatedAt"/>
+  </resultMap>
+
+  <select id="selectByCompanyId" resultMap="BaseResultMap">
+    SELECT * FROM pm_dept WHERE company_id = #{companyId} ORDER BY sort_order ASC, id ASC
+  </select>
+
+  <select id="selectById" resultMap="BaseResultMap">
+    SELECT * FROM pm_dept WHERE id = #{id}
+  </select>
+
+  <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO pm_dept (company_id, dept_code, dept_name, sort_order)
+    VALUES (#{companyId}, #{deptCode}, #{deptName}, #{sortOrder})
+  </insert>
+
+  <update id="updateById">
+    UPDATE pm_dept
+    SET company_id=#{companyId}, dept_code=#{deptCode}, dept_name=#{deptName}, sort_order=#{sortOrder}
+    WHERE id = #{id}
+  </update>
+
+  <delete id="deleteById">
+    DELETE FROM pm_dept WHERE id = #{id}
+  </delete>
+</mapper>
+

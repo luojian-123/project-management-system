@@ -7,7 +7,7 @@
       </template>
       <el-descriptions :column="2" border>
         <el-descriptions-item label="项目编码">{{ project?.projectCode }}</el-descriptions-item>
-        <el-descriptions-item label="状态">{{ statusMap[project?.status] }}</el-descriptions-item>
+        <el-descriptions-item label="状态">{{ projectStatusLabel(project?.status) }}</el-descriptions-item>
         <el-descriptions-item label="计划开始">{{ project?.planStart }}</el-descriptions-item>
         <el-descriptions-item label="计划结束">{{ project?.planEnd }}</el-descriptions-item>
         <el-descriptions-item label="描述" :span="2">{{ project?.description || '-' }}</el-descriptions-item>
@@ -17,7 +17,7 @@
     <el-card style="margin-top:16px">
       <template #header>
         <span>任务管理</span>
-        <el-button type="primary" size="small" style="float:right" @click="openTaskForm()">新增任务</el-button>
+        <el-button type="primary" size="small" @click="openTaskForm()">新增任务</el-button>
       </template>
       <el-table :data="taskList" v-loading="taskLoading" row-key="id" default-expand-all>
         <el-table-column prop="taskCode" label="任务编码" width="100" />
@@ -150,8 +150,15 @@ const taskUsers = ref([])
 const taskForm = reactive({
   id: null, projectId: null, parentId: 0, taskName: '', assigneeId: null, planStart: null, planEnd: null, actualStart: null, actualEnd: null, progress: 0, status: 'TODO', dependTaskIds: []
 })
-const statusMap = { PLANNING: '规划中', IN_PROGRESS: '进行中', PAUSED: '已暂停', CLOSED: '已关闭' }
+const projectStatusLabels = {
+  planning: '规划', PLANNING: '规划', running: '进行中', RUNNING: '进行中', closed: '已结项', CLOSED: '已结项',
+  IN_PROGRESS: '进行中', PAUSED: '已暂停'
+}
 const taskStatusMap = { TODO: '待办', IN_PROGRESS: '进行中', DONE: '已完成', CANCELLED: '已取消' }
+function projectStatusLabel(s) {
+  if (s == null || s === '') return '-'
+  return projectStatusLabels[s] ?? s
+}
 
 function flatten(tasks, out = []) {
   for (const t of tasks || []) {

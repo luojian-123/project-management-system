@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pms.mapper.SysRoleMapper">
+  <resultMap id="BaseResultMap" type="com.pms.entity.SysRole">
+    <id column="id" property="id"/>
+    <result column="code" property="code"/>
+    <result column="name" property="name"/>
+    <result column="status" property="status"/>
+    <result column="dept_id" property="deptId"/>
+    <result column="sort_order" property="sortOrder"/>
+  </resultMap>
+
+  <select id="selectList" resultMap="BaseResultMap">
+    SELECT * FROM sys_role ORDER BY dept_id, sort_order, id
+  </select>
+
+  <select id="selectByDeptId" resultMap="BaseResultMap">
+    SELECT * FROM sys_role WHERE dept_id = #{deptId} ORDER BY sort_order, id
+  </select>
+
+  <select id="selectById" resultMap="BaseResultMap">
+    SELECT * FROM sys_role WHERE id = #{id}
+  </select>
+
+  <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO sys_role (code, name, status, dept_id, sort_order)
+    VALUES (#{code}, #{name}, #{status}, #{deptId}, #{sortOrder})
+  </insert>
+
+  <update id="updateById">
+    UPDATE sys_role
+    SET code=#{code}, name=#{name}, status=#{status}, dept_id=#{deptId}, sort_order=#{sortOrder}
+    WHERE id = #{id}
+  </update>
+
+  <delete id="deleteById">
+    DELETE FROM sys_role WHERE id = #{id}
+  </delete>
+</mapper>
+

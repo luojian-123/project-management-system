@@ -11,3 +11,8 @@ export function getInfo() {
 export function register(data) {
   return request.post('/auth/register', data)
 }
+
+/** 修改密码：{ oldPassword, newPassword } */
+export function changePassword(data) {
+  return request.put('/auth/password', data)
+}

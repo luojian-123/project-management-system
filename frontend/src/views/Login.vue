@@ -58,7 +58,7 @@ async function onSubmit() {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #060816;
+  background: linear-gradient(160deg, #0a0e1a 0%, #0f172a 40%, #0c1222 100%);
   position: relative;
   overflow: hidden;
 }
@@ -67,19 +67,19 @@ async function onSubmit() {
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
-  background-size: 48px 48px;
+    linear-gradient(rgba(0,212,255,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,212,255,0.06) 1px, transparent 1px);
+  background-size: 40px 40px;
   pointer-events: none;
 }
 .login-bg-grid::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, transparent 0%, rgba(6,8,22,0.4) 50%, #060816 100%);
+  background: linear-gradient(180deg, transparent 0%, rgba(10,14,26,0.5) 50%, #0a0e1a 100%);
   pointer-events: none;
 }
-/* 光晕 */
+/* 炫彩光晕：青 + 紫 + 中央微光 */
 .login-bg-glow {
   position: absolute;
   width: 100%;
@@ -87,9 +87,9 @@ async function onSubmit() {
   top: 0;
   left: 0;
   background:
-    radial-gradient(ellipse 80% 60% at 20% 30%, rgba(0,212,255,0.12) 0%, transparent 55%),
-    radial-gradient(ellipse 70% 80% at 80% 70%, rgba(124,58,237,0.15) 0%, transparent 55%),
-    radial-gradient(ellipse 50% 50% at 50% 50%, rgba(0,212,255,0.04) 0%, transparent 70%);
+    radial-gradient(ellipse 90% 70% at 15% 20%, rgba(0,212,255,0.18) 0%, transparent 50%),
+    radial-gradient(ellipse 80% 90% at 85% 80%, rgba(124,58,237,0.2) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 60% at 50% 50%, rgba(168,85,247,0.06) 0%, transparent 65%);
   pointer-events: none;
 }
 /* 斜向科技线条 */
@@ -102,8 +102,8 @@ async function onSubmit() {
     105deg,
     transparent,
     transparent 80px,
-    rgba(0,212,255,0.02) 80px,
-    rgba(0,212,255,0.02) 81px
+    rgba(0,212,255,0.04) 80px,
+    rgba(0,212,255,0.04) 81px
   );
   pointer-events: none;
   animation: login-line-shift 25s linear infinite;
@@ -112,17 +112,19 @@ async function onSubmit() {
   0% { transform: translate(0, 0); }
   100% { transform: translate(81px, 0); }
 }
+/* 登录卡片：简洁白底 + 炫彩描边与投影 */
 .login-box {
   width: 420px;
   padding: 48px 44px;
-  background: linear-gradient(145deg, rgba(255,255,255,0.95) 0%, rgba(248,250,252,0.98) 100%);
+  background: rgba(255,255,255,0.98);
   border-radius: 20px;
-  box-shadow: 0 0 0 1px rgba(0,212,255,0.2),
-              0 0 40px rgba(0,212,255,0.08),
-              0 25px 50px -12px rgba(0,0,0,0.25),
-              inset 0 1px 0 rgba(255,255,255,0.8);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.6),
+    0 0 60px -10px rgba(0,212,255,0.2),
+    0 0 80px -20px rgba(124,58,237,0.15),
+    0 28px 56px -14px rgba(0,0,0,0.35);
   position: relative;
-  backdrop-filter: blur(12px);
+  backdrop-filter: blur(16px);
 }
 .login-box::before {
   content: '';
@@ -130,7 +132,7 @@ async function onSubmit() {
   inset: -1px;
   border-radius: 21px;
   padding: 1px;
-  background: linear-gradient(135deg, rgba(0,212,255,0.5), rgba(124,58,237,0.4), rgba(168,85,247,0.3));
+  background: linear-gradient(135deg, rgba(0,212,255,0.6), rgba(124,58,237,0.5), rgba(168,85,247,0.45));
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
@@ -143,37 +145,64 @@ async function onSubmit() {
   font-weight: 700;
   margin-bottom: 10px;
   letter-spacing: 0.04em;
-  background: linear-gradient(135deg, #00d4ff 0%, #7c3aed 50%, #a855f7 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  filter: drop-shadow(0 2px 8px rgba(0,212,255,0.3));
+  color: #000;
+  background: none;
+  -webkit-background-clip: unset;
+  -webkit-text-fill-color: #000;
+  background-clip: unset;
 }
-.login-desc { font-size: 0.875rem; color: #64748b; }
+.login-desc { font-size: 0.875rem; color: #262626; letter-spacing: 0.02em; }
 .form :deep(.el-form-item) { margin-bottom: 20px; }
 .form :deep(.el-form-item:last-child) { margin-bottom: 0; margin-top: 12px; }
+/* 登录页输入框：科技感描边，聚焦青紫光晕 */
 .form :deep(.input-tech .el-input__wrapper) {
-  border-radius: 10px;
-  box-shadow: 0 0 0 1px rgba(0,212,255,0.2);
+  border-radius: 10px !important;
+  min-height: 44px !important;
+  height: 44px !important;
+  background: #ffffff !important;
+  box-shadow: 0 0 0 1px rgba(0,212,255,0.15) !important;
   transition: box-shadow 0.25s ease;
 }
-.form :deep(.input-tech .el-input__wrapper:hover),
-.form :deep(.input-tech .el-input__wrapper.is-focus) {
-  box-shadow: 0 0 0 1px rgba(0,212,255,0.5), 0 0 16px rgba(0,212,255,0.1);
+.form :deep(.input-tech .el-input__wrapper:hover) {
+  box-shadow: 0 0 0 1px rgba(0,212,255,0.3) !important;
 }
-.btn-login {
-  width: 100%;
-  height: 46px;
-  font-size: 1rem;
-  font-weight: 600;
-  border-radius: 10px;
-  background: linear-gradient(135deg, #00d4ff 0%, #7c3aed 100%) !important;
+.form :deep(.input-tech .el-input__wrapper.is-focus) {
+  box-shadow: 0 0 0 2px rgba(0,212,255,0.5), 0 0 20px rgba(0,212,255,0.12) !important;
+}
+.form :deep(.input-tech .el-input__inner::placeholder),
+.form :deep(.input-tech input::placeholder) {
+  color: #595959 !important;
+}
+.form :deep(.input-tech .el-input__inner),
+.form :deep(.input-tech input) {
+  color: #000 !important;
+}
+.form :deep(.input-tech .el-input__prefix .el-icon) {
+  color: #262626 !important;
+}
+/* 登录按钮：炫彩渐变 + 光晕，简洁大气 */
+.login-page .btn-login.el-button {
+  width: 100% !important;
+  min-height: 46px !important;
+  height: 46px !important;
+  padding: 0 20px !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  border-radius: 10px !important;
+  color: #ffffff !important;
+  text-shadow: none !important;
+  background: linear-gradient(90deg, #00d4ff 0%, #6366f1 50%, #a855f7 100%) !important;
   border: none !important;
-  box-shadow: 0 4px 20px rgba(0,212,255,0.35), 0 0 0 0 rgba(124,58,237,0.2);
+  box-shadow: 0 4px 24px rgba(0,212,255,0.4), 0 4px 20px rgba(124,58,237,0.25) !important;
   transition: transform 0.2s ease, box-shadow 0.25s ease;
 }
-.btn-login:hover {
-  box-shadow: 0 6px 28px rgba(0,212,255,0.45), 0 4px 20px rgba(124,58,237,0.3) !important;
-  transform: translateY(-1px);
+.login-page .btn-login.el-button:hover {
+  color: #ffffff !important;
+  box-shadow: 0 6px 32px rgba(0,212,255,0.5), 0 6px 28px rgba(124,58,237,0.35) !important;
+  transform: translateY(-2px);
+}
+.login-page .btn-login.el-button:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 24px rgba(0,212,255,0.35) !important;
 }
 </style>

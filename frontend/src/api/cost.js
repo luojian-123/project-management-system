@@ -4,6 +4,11 @@ export function costSummaryByProject(projectId) {
   return request.get(`/cost/project/${projectId}/summary`)
 }
 
+/** 分页查询：params = { projectId?, page, size } */
+export function costPage(params) {
+  return request.get('/cost/page', { params })
+}
+
 export function costPageByProject(projectId, params) {
   return request.get(`/cost/project/${projectId}/page`, { params })
 }

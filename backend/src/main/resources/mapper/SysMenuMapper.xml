@@ -23,4 +23,21 @@
   <select id="selectChildren" resultMap="BaseResultMap">
     SELECT * FROM sys_menu WHERE parent_id = #{parentId} AND status = 1 ORDER BY sort_order
   </select>
+  <select id="selectAll" resultMap="BaseResultMap">
+    SELECT * FROM sys_menu ORDER BY parent_id, sort_order, id
+  </select>
+  <select id="selectById" resultMap="BaseResultMap">
+    SELECT * FROM sys_menu WHERE id = #{id}
+  </select>
+  <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO sys_menu (parent_id, name, path, component, permission, type, sort_order, icon, status)
+    VALUES (#{parentId}, #{name}, #{path}, #{component}, #{permission}, #{type}, #{sortOrder}, #{icon}, #{status})
+  </insert>
+  <update id="updateById">
+    UPDATE sys_menu
+    SET parent_id=#{parentId}, name=#{name}, path=#{path}, component=#{component}, permission=#{permission},
+        type=#{type}, sort_order=#{sortOrder}, icon=#{icon}, status=#{status}
+    WHERE id = #{id}
+  </update>
+  <delete id="deleteById">DELETE FROM sys_menu WHERE id = #{id}</delete>
 </mapper>

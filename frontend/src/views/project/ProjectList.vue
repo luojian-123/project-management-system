@@ -1,8 +1,9 @@
 <template>
-  <el-card>
+  <div class="page">
+    <el-card>
     <template #header>
       <span>项目管理</span>
-      <div style="float:right; display:flex; gap:8px; align-items:center">
+      <div style="display:flex; gap:8px; align-items:center">
         <el-input v-model="keyword" placeholder="项目编号/名称" clearable style="width:180px" @keyup.enter="fetchList" />
         <el-select v-model="status" placeholder="状态" clearable style="width:100px" @change="fetchList">
           <el-option label="规划" value="planning" />
@@ -24,7 +25,9 @@
       <el-table-column prop="ownerName" label="负责人" width="100" />
       <el-table-column prop="planStart" label="计划开始" width="110" />
       <el-table-column prop="planEnd" label="计划结束" width="110" />
-      <el-table-column prop="status" label="状态" width="90" />
+      <el-table-column label="状态" width="90">
+        <template #default="{ row }">{{ projectStatusMap[row?.status] ?? row?.status ?? '-' }}</template>
+      </el-table-column>
       <el-table-column label="操作" width="80" fixed="right" align="center">
         <template #default="{ row }">
           <el-dropdown trigger="click" @command="(cmd) => cmd === 'edit' ? openForm(row) : handleDelete(row)">
@@ -82,7 +85,8 @@
         <el-button type="primary" :loading="submitLoading" @click="submitForm">确定</el-button>
       </template>
     </el-dialog>
-  </el-card>
+    </el-card>
+  </div>
 </template>
 
 <script setup>
@@ -94,6 +98,14 @@ import { projectPage, projectSave, projectUpdate, projectDelete } from '@/api/pr
 
 const router = useRouter()
 const loading = ref(false)
+const projectStatusMap = {
+  planning: '规划',
+  PLANNING: '规划',
+  running: '进行中',
+  RUNNING: '进行中',
+  closed: '已结项',
+  CLOSED: '已结项'
+}
 const list = ref([])
 const total = ref(0)
 const page = ref(1)

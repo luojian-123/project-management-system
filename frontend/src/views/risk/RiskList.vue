@@ -1,10 +1,11 @@
 <template>
-  <el-card>
-    <template #header>
-      <span>风险管理</span>
-      <el-button type="primary" style="float:right" @click="openForm()">新增</el-button>
-    </template>
-    <el-table v-loading="loading" :data="list" stripe>
+  <div class="page">
+    <PageCard>
+      <template #header><span>风险管理</span></template>
+      <template #actions>
+        <el-button type="primary" @click="openForm()">新增</el-button>
+      </template>
+      <el-table v-loading="loading" :data="list" stripe>
       <el-table-column label="标题" min-width="160">
         <template #default="{ row }">
           <span class="link-name" @click="openForm(row)">{{ row.title || '-' }}</span>
@@ -12,7 +13,9 @@
       </el-table-column>
       <el-table-column prop="projectId" label="项目ID" width="90" />
       <el-table-column prop="level" label="等级" width="90" />
-      <el-table-column prop="status" label="状态" width="90" />
+      <el-table-column label="状态" width="90">
+        <template #default="{ row }">{{ riskStatusMap[row?.status] ?? row?.status ?? '-' }}</template>
+      </el-table-column>
       <el-table-column prop="createdAt" label="创建时间" width="170" />
       <el-table-column label="操作" width="80" fixed="right" align="center">
         <template #default="{ row }">
@@ -66,7 +69,8 @@
         <el-button type="primary" :loading="submitLoading" @click="submitForm">确定</el-button>
       </template>
     </el-dialog>
-  </el-card>
+    </PageCard>
+  </div>
 </template>
 
 <script setup>
@@ -76,6 +80,7 @@ import { ArrowDown } from '@element-plus/icons-vue'
 import { riskPage, riskSave, riskUpdate, riskDelete } from '@/api/risk'
 
 const loading = ref(false)
+const riskStatusMap = { identified: '识别', mitigating: '应对中', closed: '已关闭' }
 const list = ref([])
 const total = ref(0)
 const page = ref(1)
