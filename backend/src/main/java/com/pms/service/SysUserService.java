@@ -51,12 +51,19 @@ public class SysUserService {
             } else {
                 user.setPassword(exist.getPassword());
             }
+            if ("admin".equals(exist.getUsername()) && user.getStatus() != null && user.getStatus() == 0) {
+                user.setStatus(1);
+            }
             userMapper.updateById(user);
         }
     }
 
     @Transactional(rollbackFor = Exception.class)
     public void deleteById(Long id) {
+        SysUser user = userMapper.selectById(id);
+        if (user != null && "admin".equals(user.getUsername())) {
+            throw new RuntimeException("管理员账号不能删除");
+        }
         userRoleMapper.deleteByUserId(id);
         userMapper.deleteById(id);
     }

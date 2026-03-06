@@ -1,59 +1,56 @@
 <template>
   <div class="page">
-    <el-row :gutter="16">
-    <el-col :span="8">
-      <el-card shadow="never">
-        <template #header>
-          <span>组织树</span>
-          <div>
-            <el-button type="primary" link @click="loadTree">刷新</el-button>
-          </div>
-        </template>
-        <div v-loading="treeLoading" @contextmenu.prevent>
-          <el-tree
-            :data="treeData"
-            node-key="nodeKey"
-            :props="{ label: 'label', children: 'children' }"
-            default-expand-all
-            highlight-current
-            :expand-on-click-node="false"
-            @node-click="onNodeClick"
-          />
+    <el-card>
+      <template #header>
+        <span>组织树</span>
+        <div style="display:flex; gap:8px; align-items:center">
+          <el-button type="primary" link @click="loadTree">刷新</el-button>
+          <!-- 用户为最底层节点，不显示新增 -->
+          <el-button v-if="currentNode?.type && currentNode.type !== 'role' && currentNode.type !== 'user'" type="primary" @click="openCompanyForm()">新增公司</el-button>
+          <el-button v-if="currentNode?.type === 'company'" type="primary" @click="openDeptForm(null, currentNode.id)">新增部门</el-button>
+          <el-button v-if="currentNode?.type === 'dept'" type="primary" @click="openRoleForm(null, currentNode.id)">新增角色</el-button>
+          <el-button v-if="currentNode?.type === 'role'" type="primary" @click="openUserForm()">新增用户</el-button>
         </div>
-      </el-card>
-    </el-col>
-    <el-col :span="16">
-      <el-card shadow="never">
-        <template #header>
-          <span>节点详情</span>
-          <div style="display:flex; gap:8px">
-            <el-button v-if="currentNode?.type !== 'role'" type="primary" @click="openCompanyForm()">新增公司</el-button>
-            <el-button v-if="currentNode?.type === 'company'" type="primary" @click="openDeptForm(null, currentNode.id)">新增部门</el-button>
-            <el-button v-if="currentNode?.type === 'dept'" type="primary" @click="openRoleForm(null, currentNode.id)">新增角色</el-button>
-            <el-button v-if="currentNode?.type === 'role'" type="primary" @click="openUserForm()">新增用户</el-button>
+      </template>
+      <el-row :gutter="20">
+        <el-col :span="8">
+          <div v-loading="treeLoading" @contextmenu.prevent>
+            <el-tree
+              :data="treeData"
+              node-key="nodeKey"
+              :props="{ label: 'label', children: 'children' }"
+              default-expand-all
+              highlight-current
+              :expand-on-click-node="false"
+              @node-click="onNodeClick"
+            />
           </div>
-        </template>
-
-        <el-empty v-if="!currentNode" description="请选择左侧节点" />
-
-        <template v-else>
-          <el-descriptions :column="1" border>
-            <el-descriptions-item label="类型">{{ typeText(currentNode.type) }}</el-descriptions-item>
-            <el-descriptions-item label="ID">{{ currentNode.id }}</el-descriptions-item>
-            <el-descriptions-item label="名称">{{ currentNode.label }}</el-descriptions-item>
-          </el-descriptions>
-          <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap">
-            <el-button v-if="currentNode.type === 'company'" type="primary" @click="openCompanyForm(currentNode.id)">编辑公司</el-button>
-            <el-button v-if="currentNode.type === 'company'" type="danger" @click="doDeleteCompany">删除公司</el-button>
-            <el-button v-if="currentNode.type === 'dept'" type="primary" @click="openDeptForm(currentNode.id)">编辑部门</el-button>
-            <el-button v-if="currentNode.type === 'dept'" type="danger" @click="doDeleteDept">删除部门</el-button>
-            <el-button v-if="currentNode.type === 'role'" type="primary" @click="openRoleForm(currentNode.id)">编辑角色</el-button>
-            <el-button v-if="currentNode.type === 'role'" type="danger" @click="doDeleteRole">删除角色</el-button>
+        </el-col>
+        <el-col :span="16">
+          <div class="node-detail">
+            <div class="node-detail__title">节点详情</div>
+            <el-empty v-if="!currentNode" description="请选择左侧节点" />
+            <template v-else>
+              <el-descriptions :column="1" border>
+                <el-descriptions-item label="类型">{{ typeText(currentNode.type) }}</el-descriptions-item>
+                <el-descriptions-item label="ID">{{ currentNode.id }}</el-descriptions-item>
+                <el-descriptions-item label="名称">{{ currentNode.label }}</el-descriptions-item>
+              </el-descriptions>
+              <div v-if="currentNode.type && ['company','dept','role','user'].includes(currentNode.type)" style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap">
+                <el-button v-if="currentNode.type === 'company'" type="primary" @click="openCompanyForm(currentNode.id)">编辑公司</el-button>
+                <el-button v-if="currentNode.type === 'company'" type="danger" @click="doDeleteCompany">删除公司</el-button>
+                <el-button v-if="currentNode.type === 'dept'" type="primary" @click="openDeptForm(currentNode.id)">编辑部门</el-button>
+                <el-button v-if="currentNode.type === 'dept'" type="danger" @click="doDeleteDept">删除部门</el-button>
+                <el-button v-if="currentNode.type === 'role'" type="primary" @click="openRoleForm(currentNode.id)">编辑角色</el-button>
+                <el-button v-if="currentNode.type === 'role'" type="danger" @click="doDeleteRole">删除角色</el-button>
+                <el-button v-if="currentNode.type === 'user'" type="primary" @click="openUserEditForm()">编辑用户</el-button>
+                <el-button v-if="currentNode.type === 'user'" type="danger" :disabled="isCurrentUserAdmin" @click="doDeleteUser">删除用户</el-button>
+              </div>
+            </template>
           </div>
-        </template>
-      </el-card>
-    </el-col>
-  </el-row>
+        </el-col>
+      </el-row>
+    </el-card>
 
   <!-- 公司 -->
   <el-dialog v-model="companyVisible" title="公司" width="520px" @close="companyRef?.resetFields()">
@@ -136,15 +133,37 @@
       <el-button type="primary" :loading="submitLoading" :disabled="!userForm.userId" @click="submitUserRole">确定</el-button>
     </template>
   </el-dialog>
+
+  <!-- 编辑用户（组织树用户节点） -->
+  <el-dialog v-model="userEditVisible" title="编辑用户" width="480px" @close="userEditRef?.resetFields()">
+    <el-form ref="userEditRef" :model="userEditForm" label-width="90px">
+      <el-form-item label="用户名"><el-input v-model="userEditForm.username" disabled /></el-form-item>
+      <el-form-item label="新密码"><el-input v-model="userEditForm.password" type="password" placeholder="不填则保持原密码" show-password /></el-form-item>
+      <el-form-item label="姓名"><el-input v-model="userEditForm.realName" placeholder="姓名" /></el-form-item>
+      <el-form-item label="邮箱"><el-input v-model="userEditForm.email" placeholder="邮箱" /></el-form-item>
+      <el-form-item label="手机"><el-input v-model="userEditForm.phone" placeholder="手机" /></el-form-item>
+      <el-form-item label="状态">
+        <el-radio-group v-model="userEditForm.status" :disabled="userEditForm.username === 'admin'">
+          <el-radio :label="1">启用</el-radio>
+          <el-radio :label="0">禁用</el-radio>
+        </el-radio-group>
+        <span v-if="userEditForm.username === 'admin'" class="admin-status-tip">管理员账号不能禁用</span>
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <el-button @click="userEditVisible = false">取消</el-button>
+      <el-button type="primary" :loading="submitLoading" @click="submitUserEdit">确定</el-button>
+    </template>
+  </el-dialog>
   </div>
 </template>
 
 <script setup>
-import { onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import * as orgApi from '@/api/org'
 import { roleGet, roleSave, roleUpdate, roleDelete } from '@/api/role'
-import { userPage, getUserRoleIds, userAssignRoles } from '@/api/user'
+import { userPage, userGet, userUpdate, userDelete, getUserRoleIds, userAssignRoles } from '@/api/user'
 
 const treeData = ref([])
 const currentNode = ref(null)
@@ -201,9 +220,21 @@ async function loadTree() {
   }
 }
 
+const currentUserDetail = ref(null)
+
 function onNodeClick(node) {
   currentNode.value = node
+  if (node?.type === 'user' && node.id) {
+    userGet(node.id).then((d) => {
+      const u = d?.data ?? d
+      currentUserDetail.value = u || null
+    }).catch(() => { currentUserDetail.value = null })
+  } else {
+    currentUserDetail.value = null
+  }
 }
+
+const isCurrentUserAdmin = computed(() => currentUserDetail.value?.username === 'admin')
 
 // 公司表单
 const companyVisible = ref(false)
@@ -296,6 +327,67 @@ const userVisible = ref(false)
 const userForm = reactive({ userId: null })
 const userList = ref([])
 const userListLoading = ref(false)
+
+const userEditVisible = ref(false)
+const userEditRef = ref(null)
+const userEditForm = reactive({ id: null, username: '', password: '', realName: '', email: '', phone: '', status: 1 })
+
+function openUserEditForm() {
+  if (currentNode.value?.type !== 'user' || !currentNode.value?.id) return
+  userGet(currentNode.value.id).then((d) => {
+    const u = d?.data ?? d
+    if (u) {
+      Object.assign(userEditForm, { id: u.id, username: u.username ?? '', password: '', realName: u.realName ?? '', email: u.email ?? '', phone: u.phone ?? '', status: u.status ?? 1 })
+      if (userEditForm.username === 'admin') userEditForm.status = 1
+    }
+  }).catch(() => {})
+  userEditVisible.value = true
+}
+
+async function submitUserEdit() {
+  submitLoading.value = true
+  try {
+    const payload = { ...userEditForm }
+    if (!payload.password?.trim()) delete payload.password
+    if (payload.username === 'admin') payload.status = 1
+    await userUpdate(payload)
+    ElMessage.success('保存成功')
+    userEditVisible.value = false
+    if (currentUserDetail.value) Object.assign(currentUserDetail.value, userEditForm)
+    await loadTree()
+  } catch (e) {
+    const msg = e?.response?.data?.message ?? e?.message ?? e?.msg ?? '保存失败'
+    ElMessage.error(msg)
+  } finally {
+    submitLoading.value = false
+  }
+}
+
+async function doDeleteUser() {
+  if (currentNode.value?.type !== 'user' || !currentNode.value?.id) return
+  if (isCurrentUserAdmin.value) {
+    ElMessage.warning('管理员账号不能删除')
+    return
+  }
+  try {
+    await ElMessageBox.confirm('确定要删除该用户吗？', '删除确认', { type: 'warning' })
+  } catch {
+    return
+  }
+  submitLoading.value = true
+  try {
+    await userDelete(currentNode.value.id)
+    ElMessage.success('删除成功')
+    currentNode.value = null
+    currentUserDetail.value = null
+    await loadTree()
+  } catch (e) {
+    const msg = e?.response?.data?.message ?? e?.message ?? e?.msg ?? '删除失败'
+    ElMessage.error(msg)
+  } finally {
+    submitLoading.value = false
+  }
+}
 
 function openUserForm() {
   if (currentNode.value?.type !== 'role') return
@@ -431,3 +523,17 @@ onMounted(() => {
   }
 })
 </script>
+
+<style scoped>
+.node-detail__title {
+  font-weight: 500;
+  font-size: 0.9375rem;
+  color: #000;
+  margin-bottom: 12px;
+}
+.admin-status-tip {
+  margin-left: 8px;
+  font-size: 0.8125rem;
+  color: var(--text-secondary, #262626);
+}
+</style>
