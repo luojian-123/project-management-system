@@ -35,10 +35,13 @@ request.interceptors.response.use(
     return Promise.reject(new Error(msg))
   },
   err => {
-    if (err.response?.status === 401) {
+    const status = err.response?.status
+    if (status === 401 || status === 403) {
       localStorage.removeItem('token')
       localStorage.removeItem('user')
       router.push('/login')
+      ElMessage.error(status === 401 ? '未登录或登录已失效' : '无权限或登录已失效，请重新登录')
+      return Promise.reject(err)
     }
     const body = err.response?.data
     const msg = parseValidationError(body) || body?.message || err.message || '网络错误'

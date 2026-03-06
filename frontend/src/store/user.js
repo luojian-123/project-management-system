@@ -1,5 +1,19 @@
 import { defineStore } from 'pinia'
 import { login as apiLogin, getInfo } from '@/api/auth'
+import { menuTree } from '@/api/menu'
+
+async function setMenusForUser(store, data) {
+  if (data.username === 'admin') {
+    try {
+      const fullTree = await menuTree(true)
+      store.menus = Array.isArray(fullTree) ? fullTree : (fullTree?.data ?? fullTree?.children ?? [])
+    } catch {
+      store.menus = data.menus || []
+    }
+  } else {
+    store.menus = data.menus || []
+  }
+}
 
 function getStoredUser() {
   try {
@@ -20,7 +34,8 @@ export const useUserStore = defineStore('user', {
       username: stored.username ?? '',
       realName: stored.realName ?? '',
       avatar: stored.avatar ?? null,
-      menus: []
+      menus: [],
+      roleCodes: stored.roleCodes ?? []
     }
   },
   actions: {
@@ -30,17 +45,26 @@ export const useUserStore = defineStore('user', {
       this.userId = data.userId
       this.username = data.username
       this.realName = data.realName
-      this.menus = data.menus || []
+      this.roleCodes = Array.isArray(data.roleCodes) ? data.roleCodes : []
+      await setMenusForUser(this, data)
       localStorage.setItem('token', data.token)
-      localStorage.setItem('user', JSON.stringify({ userId: data.userId, username: data.username, realName: data.realName, avatar: data.avatar ?? null }))
+      localStorage.setItem('user', JSON.stringify({ userId: data.userId, username: data.username, realName: data.realName, avatar: data.avatar ?? null, roleCodes: this.roleCodes }))
     },
     async fetchInfo() {
       const data = await getInfo()
       this.userId = data.userId
       this.username = data.username
       this.realName = data.realName
-      if (data.avatar != null) this.avatar = data.avatar
-      this.menus = data.menus || []
+      // 接口有头像则用接口的；否则保留本地已保存的头像（避免刷新后丢失）
+      if (data.avatar != null && data.avatar !== '') {
+        this.avatar = data.avatar
+      } else {
+        const stored = getStoredUser()
+        if (stored.avatar) this.avatar = stored.avatar
+      }
+      this.roleCodes = Array.isArray(data.roleCodes) ? data.roleCodes : []
+      await setMenusForUser(this, data)
+      localStorage.setItem('user', JSON.stringify({ userId: this.userId, username: this.username, realName: this.realName, avatar: this.avatar ?? null, roleCodes: this.roleCodes }))
     },
     logout() {
       this.token = ''
@@ -49,6 +73,7 @@ export const useUserStore = defineStore('user', {
       this.realName = ''
       this.avatar = null
       this.menus = []
+      this.roleCodes = []
       localStorage.removeItem('token')
       localStorage.removeItem('user')
     },

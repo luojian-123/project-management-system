@@ -1,8 +1,8 @@
 # 重启前端开发服务（Vite）
-# 用法：在项目根目录或 D:\PMS系统代码 下，PowerShell 执行 .\restart-frontend.ps1
+# 用法：在 D:\PMS系统代码\重启 下执行 .\restart-frontend.ps1
 
 $ErrorActionPreference = "SilentlyContinue"
-$root = if ($PSScriptRoot) { $PSScriptRoot } else { Get-Location }
+$root = Split-Path $PSScriptRoot -Parent
 $frontendDir = Join-Path $root "frontend"
 
 Write-Host "正在停止占用 5173 端口的进程..." -ForegroundColor Yellow

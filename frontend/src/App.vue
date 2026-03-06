@@ -6,56 +6,103 @@
 </script>
 
 <style>
-/* ========== 基础与设计变量（统一美观与规整） ========== */
+/* ========== 基础与设计变量（方正字体 + 炫彩布局） ========== */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html {
   font-size: 16px;
-  font-family: "方正兰亭黑", "方正黑体", "思源黑体", "Source Han Sans SC", "Noto Sans SC", sans-serif;
+  font-family: var(--font-sans);
 }
 html, body, #app { height: 100%; }
 body {
-  font-family: "方正兰亭黑", "方正黑体", "思源黑体", "Source Han Sans SC", "Noto Sans SC", sans-serif;
+  font-family: var(--font-sans);
   font-weight: 400;
-  color: #000;
+  color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   letter-spacing: 0.02em;
   line-height: 1.5;
 }
 
 :root {
-  /* 主题色 */
-  --tech-cyan: #00d4ff;
+  /* 方正字体优先，符合页面炫彩布局 */
+  --font-sans: "方正兰亭黑", "方正黑体", "FZLanTingHei-R-GBK", "思源黑体", "Source Han Sans SC", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-mono: "方正书宋", "Consolas", "Monaco", monospace;
+  /* 中性色（Plasmic 常用 token） */
+  --neutral-50: #fafafa;
+  --neutral-100: #f5f5f5;
+  --neutral-200: #e5e5e5;
+  --neutral-300: #d4d4d4;
+  --neutral-400: #a3a3a3;
+  --neutral-500: #737373;
+  --neutral-600: #525252;
+  --neutral-700: #404040;
+  --neutral-800: #262626;
+  --neutral-900: #171717;
+  /* 主题色（保留品牌，略收敛） */
+  --tech-cyan: #0ea5e9;
   --tech-purple: #7c3aed;
-  --tech-violet: #a855f7;
-  --primary-start: #00b4d8;
-  --primary-mid: #0096c7;
+  --tech-violet: #8b5cf6;
+  --primary-start: #0ea5e9;
+  --primary-mid: #0284c7;
   --primary-end: #7c3aed;
-  /* 文字（全局黑色，按钮内文字除外） */
-  --text-primary: #000000;
-  --text-secondary: #262626;
-  --text-placeholder: #595959;
+  /* 文字 */
+  --text-primary: #171717;
+  --text-secondary: #525252;
+  --text-placeholder: #737373;
   /* 边框与背景 */
-  --border-light: rgba(0, 212, 255, 0.12);
-  --border-card: rgba(0, 212, 255, 0.15);
-  --bg-header: linear-gradient(180deg, rgba(248,250,252,0.98) 0%, rgba(241,245,249,0.6) 100%);
-  --bg-main: linear-gradient(160deg, #f0f9ff 0%, #f8fafc 42%, #f1f5f9 100%);
-  /* 圆角与间距（8px 栅格） */
+  --border-light: #e5e5e5;
+  --border-card: #e5e5e5;
+  --bg-header: #fafafa;
+  --bg-main: #fafafa;
+  /* 圆角与间距（8px 栅格，Plasmic 常用） */
   --radius-sm: 6px;
   --radius-md: 8px;
-  --radius-lg: 14px;
+  --radius-lg: 12px;
+  --radius-btn: 4px;
   --space-page: 24px;
-  --space-card: 20px;
-  --space-header: 16px 20px;
-  --gap-section: 20px;
+  --space-card: 24px;
+  --space-header: 16px 24px;
+  --gap-section: 24px;
   --gap-block: 12px;
   --gap-inline: 8px;
-  /* 阴影（立体感加强） */
-  --shadow-card: 0 2px 12px rgba(0,0,0,0.06), 0 0 0 1px rgba(255,255,255,0.85) inset, 0 0 24px rgba(0,212,255,0.05);
-  --shadow-btn: 0 2px 0 rgba(0,0,0,0.08), 0 3px 8px rgba(0,180,216,0.3), 0 1px 0 rgba(255,255,255,0.6) inset;
-  --shadow-btn-hover: 0 3px 0 rgba(0,0,0,0.08), 0 5px 14px rgba(0,180,216,0.38), 0 1px 0 rgba(255,255,255,0.7) inset;
-  --shadow-btn-active: 0 0 0 rgba(0,0,0,0.1), 0 1px 4px rgba(0,180,216,0.25), 0 -1px 0 rgba(0,0,0,0.06) inset;
-  --shadow-dropdown: 0 3px 0 rgba(0,0,0,0.06), 0 6px 20px rgba(0,0,0,0.1), 0 1px 0 rgba(255,255,255,0.9) inset;
-  --shadow-input-focus: 0 0 0 2px rgba(0, 212, 255, 0.25);
+  /* 阴影（柔和、少高光，Plasmic 风格） */
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-card-hover: 0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+  --shadow-btn: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-btn-hover: 0 2px 4px rgba(0,0,0,0.08);
+  --shadow-btn-active: 0 0 0 1px rgba(0,0,0,0.06) inset;
+  --shadow-dropdown: 0 4px 12px rgba(0,0,0,0.1), 0 2px 4px rgba(0,0,0,0.06);
+  --shadow-input-focus: 0 0 0 2px rgba(14, 165, 233, 0.35);
+}
+
+/* 全局统一方正字体，符合炫彩布局 */
+#app,
+#app .el-card, #app .el-card__header, #app .el-card__body,
+#app .el-button, #app .el-input, #app .el-select, #app .el-form-item, #app .el-form-item__label,
+#app .el-table, #app .el-table th, #app .el-table td,
+#app .el-dialog, #app .el-dialog__header, #app .el-dialog__body, #app .el-dialog__footer,
+#app .el-pagination, #app .el-dropdown, #app .el-menu,
+#app .el-tabs, #app .el-tag, #app .el-message, #app .el-message-box {
+  font-family: var(--font-sans) !important;
+}
+
+/* 表格操作列防穿模：按钮不换行、不重叠 */
+.table-actions-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  flex-wrap: nowrap;
+}
+.table-actions-cell .el-button {
+  flex-shrink: 0;
+}
+
+/* 抽屉页四边一点点圆角（全局生效，抽屉可能挂载到 body） */
+#app .org-lib-drawer.el-drawer,
+.org-lib-drawer.el-drawer {
+  border-radius: 8px !important;
+  overflow: hidden;
 }
 
 /* ========== 内容区与卡片（统一页面宽度与组件距离） ========== */
@@ -72,18 +119,32 @@ body {
   position: relative;
   border-radius: var(--radius-lg) !important;
   border: 1px solid var(--border-card) !important;
-  box-shadow: var(--shadow-card) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04) !important;
   overflow: hidden;
   background: #fff;
+  transition: box-shadow 0.2s ease;
+}
+.el-card:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.04) !important;
 }
 .el-card::before {
   content: '';
   position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, var(--tech-cyan), var(--tech-purple), var(--tech-violet));
-  opacity: 0.88;
-  z-index: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  background: linear-gradient(90deg, #06b6d4, #0ea5e9, #8b5cf6, #a855f7, #ec4899, #f59e0b, #06b6d4);
+  background-size: 300% 100%;
+  box-shadow: 0 4px 16px rgba(14, 165, 233, 0.4), 0 2px 8px rgba(139, 92, 246, 0.3);
+  z-index: 10;
+  pointer-events: none;
+  animation: el-card-top-shine 5s linear infinite;
+}
+@keyframes el-card-top-shine {
+  0% { background-position: 0% 0; }
+  100% { background-position: 300% 0; }
 }
 .el-card__header {
   display: flex !important;
@@ -94,7 +155,7 @@ body {
   padding: var(--space-header) !important;
   font-weight: 500;
   font-size: 0.9375rem;
-  color: #000;
+  color: var(--text-primary);
   border-bottom: 1px solid var(--border-light) !important;
   background: var(--bg-header) !important;
   position: relative;
@@ -125,12 +186,12 @@ body {
   --el-table-header-bg-color: rgba(248,250,252,0.95) !important;
   --el-table-row-hover-bg-color: rgba(0,212,255,0.04) !important;
   --el-table-tr-bg-color: #fff !important;
-  --el-table-header-text-color: #000 !important;
+  --el-table-header-text-color: var(--text-primary) !important;
 }
 .el-table th.el-table__cell {
   font-weight: 500;
   font-size: 0.8125rem;
-  color: #000;
+  color: var(--text-primary);
 }
 .el-table .el-table__inner-wrapper::before { display: none; }
 .el-table--striped .el-table__body tr.el-table__row--striped td { background: rgba(241,245,249,0.6) !important; }
@@ -143,12 +204,12 @@ body {
 }
 .el-pagination .el-pager li,
 .el-pagination button {
-  border-radius: var(--radius-sm) !important;
+  border-radius: var(--radius-btn) !important;
   min-width: 26px;
   height: 26px !important;
   font-size: 0.8125rem !important;
   font-weight: 500;
-  color: #000;
+  color: var(--text-primary);
 }
 .el-pagination .el-pager li.is-active {
   background: linear-gradient(135deg, var(--primary-start), var(--primary-end)) !important;
@@ -158,11 +219,11 @@ body {
 
 /* ========== 按钮（更小、立体感，与布局严格对齐） ========== */
 .el-button {
-  border-radius: var(--radius-sm) !important;
+  border-radius: var(--radius-btn) !important;
   font-weight: 500;
   font-size: 0.75rem !important;
   letter-spacing: 0.02em;
-  text-shadow: 0 1px 0 rgba(255,255,255,0.35);
+  text-shadow: none !important;
   transition: box-shadow 0.2s ease, transform 0.2s ease;
   min-height: 26px !important;
   height: 26px !important;
@@ -191,36 +252,41 @@ body {
   gap: var(--gap-inline) !important;
   flex-wrap: wrap !important;
 }
+/* 卡片内按钮与全局一致，圆角一点点 */
+#app .el-card .el-button,
+#app .plasmic-card .el-button {
+  border-radius: var(--radius-btn) !important;
+}
 .el-button--primary:not(.is-link) {
   background: linear-gradient(90deg, var(--primary-start) 0%, var(--primary-mid) 42%, var(--primary-end) 100%) !important;
   border: none !important;
   color: #fff !important;
-  box-shadow: var(--shadow-btn);
+  box-shadow: none !important;
 }
 .el-button--primary:not(.is-link):hover {
   color: #fff !important;
-  box-shadow: var(--shadow-btn-hover);
+  box-shadow: none !important;
 }
 .el-button--primary:not(.is-link):active {
   transform: translateY(2px);
   box-shadow: var(--shadow-btn-active) !important;
 }
 .el-button--default {
-  box-shadow: 0 2px 0 rgba(0,0,0,0.06), 0 2px 6px rgba(0,0,0,0.06), 0 1px 0 rgba(255,255,255,0.8) inset !important;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.06) !important;
 }
 .el-button--default:hover {
-  box-shadow: 0 3px 0 rgba(0,0,0,0.07), 0 4px 10px rgba(0,0,0,0.08), 0 1px 0 rgba(255,255,255,0.85) inset !important;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.08) !important;
 }
 .el-button--default:active {
   transform: translateY(1px);
-  box-shadow: 0 0 0 rgba(0,0,0,0.05), 0 1px 3px rgba(0,0,0,0.06), 0 -1px 0 rgba(0,0,0,0.05) inset !important;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.06) inset !important;
 }
 .el-button--danger {
-  box-shadow: 0 2px 0 rgba(0,0,0,0.08), 0 2px 6px rgba(220,38,38,0.2), 0 1px 0 rgba(255,255,255,0.5) inset !important;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.08) !important;
 }
 .el-button--danger:active {
   transform: translateY(1px);
-  box-shadow: 0 0 0 rgba(0,0,0,0.06), 0 1px 3px rgba(220,38,38,0.15) inset !important;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.06) inset !important;
 }
 .el-button.is-link { box-shadow: none; }
 
@@ -253,11 +319,11 @@ body {
   background: var(--bg-header);
   font-weight: 500;
   font-size: 0.9375rem;
-  color: #000;
+  color: var(--text-primary);
 }
 .el-dialog__body {
   padding: var(--space-card) !important;
-  color: #000;
+  color: var(--text-primary);
 }
 .el-dialog__footer {
   display: flex !important;
@@ -272,7 +338,7 @@ body {
 
 /* ========== 表单（标签与间距规整） ========== */
 .el-form-item__label {
-  color: #000 !important;
+  color: var(--text-primary) !important;
   font-weight: 500;
   font-size: 0.8125rem;
 }
@@ -282,10 +348,12 @@ body {
 /* ========== 描述列表、空状态、下拉菜单 ========== */
 .el-descriptions__label {
   font-weight: 500;
-  color: #000;
+  color: var(--text-primary);
   background: rgba(248,250,252,0.8) !important;
 }
-.el-descriptions__content { color: #000; font-weight: 400; }
+.el-descriptions__content { color: var(--text-primary); font-weight: 400; }
+/* 去掉 el-empty 默认的空盒子插图，只保留文字说明 */
+.el-empty__image { display: none !important; }
 .el-empty__description { color: #262626; font-size: 0.8125rem; font-weight: 400; }
 
 /* ========== 下拉菜单（与按钮一致：更小、立体、方正字体） ========== */
@@ -301,7 +369,7 @@ body {
   font-size: 0.8125rem !important;
   font-weight: 500 !important;
   letter-spacing: 0.02em;
-  color: #000 !important;
+  color: var(--text-primary) !important;
   padding: 6px 12px !important;
   min-height: 28px !important;
   line-height: 1.4 !important;
@@ -328,7 +396,7 @@ body {
   min-height: auto !important;
 }
 .el-table .el-dropdown .el-button.el-button--primary.is-link:hover {
-  color: #000 !important;
+  color: var(--text-primary) !important;
 }
 .el-table .el-dropdown .el-button.el-button--primary.is-link .el-icon--right {
   margin-left: 2px;

@@ -14,5 +14,6 @@ public interface SysRoleMapper {
     int insert(SysRole role);
     int updateById(SysRole role);
     int deleteById(@Param("id") Long id);
+    List<String> selectCodesByUserId(@Param("userId") Long userId);
 }
 

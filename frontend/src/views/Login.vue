@@ -44,6 +44,7 @@ async function onSubmit() {
   loading.value = true
   try {
     await userStore.login(form)
+    await userStore.fetchInfo()
     ElMessage.success('登录成功')
     router.push('/')
   } finally {

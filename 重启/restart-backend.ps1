@@ -1,8 +1,8 @@
 # 重启后端服务（Spring Boot）
-# 用法：在项目根目录或 D:\PMS系统代码 下，PowerShell 执行 .\restart-backend.ps1
+# 用法：在 D:\PMS系统代码\重启 下执行 .\restart-backend.ps1
 
 $ErrorActionPreference = "SilentlyContinue"
-$root = if ($PSScriptRoot) { $PSScriptRoot } else { Get-Location }
+$root = Split-Path $PSScriptRoot -Parent
 $backendDir = Join-Path $root "backend"
 $jarPath = Join-Path $backendDir "target\pms-backend-1.0.0.jar"
 

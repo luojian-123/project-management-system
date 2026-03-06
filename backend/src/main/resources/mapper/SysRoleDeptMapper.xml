@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pms.mapper.SysRoleDeptMapper">
+  <select id="selectDeptIdsByRoleId" resultType="long">
+    SELECT dept_id FROM sys_role_dept WHERE role_id = #{roleId} ORDER BY dept_id
+  </select>
+  <select id="selectRoleIdsByDeptId" resultType="long">
+    SELECT role_id FROM sys_role_dept WHERE dept_id = #{deptId}
+  </select>
+  <delete id="deleteByRoleId">DELETE FROM sys_role_dept WHERE role_id = #{roleId}</delete>
+  <insert id="insert">INSERT INTO sys_role_dept (role_id, dept_id) VALUES (#{roleId}, #{deptId})</insert>
+</mapper>

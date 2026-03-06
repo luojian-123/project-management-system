@@ -4,7 +4,7 @@
     <template #header>
       <div class="card-header">
         <div>
-          <span>个人待办</span>
+          <span>我的任务</span>
           <span class="header-desc">展示您作为责任人的任务数据</span>
         </div>
       </div>
@@ -37,21 +37,24 @@
       </el-table-column>
       <el-table-column label="操作" width="100" fixed="right" align="center">
         <template #default="{ row }">
-          <template v-if="row._source === 'todo'">
-            <el-dropdown trigger="click" @command="(cmd) => cmd === 'edit' ? openForm(row) : handleDelete(row)">
-              <el-button type="primary" link>操作<el-icon class="el-icon--right"><ArrowDown /></el-icon></el-button>
-              <template #dropdown>
-                <el-dropdown-menu>
-                  <el-dropdown-item command="edit">编辑</el-dropdown-item>
-                  <el-dropdown-item command="del" divided>删除</el-dropdown-item>
-                </el-dropdown-menu>
-              </template>
-            </el-dropdown>
-          </template>
-          <router-link v-else-if="row.id" :to="`/task/${row.id}`">
-            <el-button type="primary" link>查看</el-button>
-          </router-link>
-          <span v-else>-</span>
+          <div class="table-actions-cell">
+            <template v-if="row._source === 'todo'">
+              <el-dropdown v-if="isAdmin" trigger="click" @command="(cmd) => cmd === 'edit' ? openForm(row) : handleDelete(row)">
+                <el-button type="primary" link>操作<el-icon class="el-icon--right"><ArrowDown /></el-icon></el-button>
+                <template #dropdown>
+                  <el-dropdown-menu>
+                    <el-dropdown-item command="edit">编辑</el-dropdown-item>
+                    <el-dropdown-item command="del" divided>删除</el-dropdown-item>
+                  </el-dropdown-menu>
+                </template>
+              </el-dropdown>
+              <span v-else>-</span>
+            </template>
+            <router-link v-else-if="row.id" :to="`/task/${row.id}`">
+              <el-button type="primary" link>查看</el-button>
+            </router-link>
+            <span v-else>-</span>
+          </div>
         </template>
       </el-table-column>
     </el-table>
@@ -115,6 +118,7 @@ import { taskPageByAssignee } from '@/api/task'
 
 const router = useRouter()
 const userStore = useUserStore()
+const isAdmin = computed(() => userStore.username === 'admin')
 const currentUserId = computed(() => {
   const id = userStore.userId
   if (id != null) return id
@@ -168,6 +172,7 @@ function goTaskDetail(row) {
 }
 
 function openForm(row) {
+  if (row && row._source === 'todo' && !isAdmin.value) return
   if (row) {
     Object.assign(form, { id: row.id, userId: row.userId, title: row.title, bizType: row.bizType, priority: row.priority, dueDate: row.dueDate, status: row.status })
   } else {

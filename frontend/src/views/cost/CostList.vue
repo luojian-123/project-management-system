@@ -3,7 +3,7 @@
     <el-card>
     <template #header>
       <span>成本管理</span>
-      <el-button type="primary" @click="openForm()">新增</el-button>
+      <el-button v-if="canManageCost" type="primary" @click="openForm()">新增</el-button>
     </template>
     <el-table v-loading="loading" :data="list" stripe>
       <el-table-column label="成本类型/备注" min-width="140">
@@ -16,17 +16,19 @@
       <el-table-column prop="actualAmount" label="实际" width="100" />
       <el-table-column prop="occurDate" label="发生日期" width="120" />
       <el-table-column prop="remark" label="备注" min-width="120" show-overflow-tooltip />
-      <el-table-column label="操作" width="80" fixed="right" align="center">
+      <el-table-column v-if="canManageCost" label="操作" width="90" fixed="right" align="center">
         <template #default="{ row }">
-          <el-dropdown trigger="click" @command="(cmd) => cmd === 'edit' ? openForm(row) : handleDelete(row)">
-            <el-button type="primary" link>操作<el-icon class="el-icon--right"><ArrowDown /></el-icon></el-button>
-            <template #dropdown>
-              <el-dropdown-menu>
-                <el-dropdown-item command="edit">编辑</el-dropdown-item>
-                <el-dropdown-item command="del" divided>删除</el-dropdown-item>
-              </el-dropdown-menu>
-            </template>
-          </el-dropdown>
+          <div class="table-actions-cell">
+            <el-dropdown trigger="click" @command="(cmd) => cmd === 'edit' ? openForm(row) : handleDelete(row)">
+              <el-button type="primary" link>操作<el-icon class="el-icon--right"><ArrowDown /></el-icon></el-button>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item command="edit">编辑</el-dropdown-item>
+                  <el-dropdown-item command="del" divided>删除</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+          </div>
         </template>
       </el-table-column>
     </el-table>
@@ -71,11 +73,14 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { ArrowDown } from '@element-plus/icons-vue'
+import { useUserStore } from '@/store/user'
 import { costPage, costSave, costUpdate, costDelete } from '@/api/cost'
 
+const userStore = useUserStore()
+const canManageCost = computed(() => userStore.username === 'admin' || (Array.isArray(userStore.roleCodes) && userStore.roleCodes.includes('FINANCE')))
 const loading = ref(false)
 const list = ref([])
 const total = ref(0)
@@ -113,6 +118,7 @@ async function fetchList() {
 }
 
 function openForm(row) {
+  if (!canManageCost.value) return
   if (row) {
     Object.assign(form, { id: row.id, projectId: row.projectId, costType: row.costType, budgetAmount: row.budgetAmount, actualAmount: row.actualAmount, occurDate: row.occurDate, remark: row.remark })
   } else {

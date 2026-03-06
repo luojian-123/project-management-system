@@ -15,17 +15,19 @@
               <span class="link-name" @click="openForm(row)">{{ row[col.fieldName] ?? '-' }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="操作" width="80" fixed="right" align="center">
+          <el-table-column label="操作" width="90" fixed="right" align="center">
             <template #default="{ row }">
-              <el-dropdown trigger="click" @command="(cmd) => cmd === 'edit' ? openForm(row) : del(row)">
-                <el-button type="primary" link>操作<el-icon class="el-icon--right"><ArrowDown /></el-icon></el-button>
-                <template #dropdown>
-                  <el-dropdown-menu>
-                    <el-dropdown-item command="edit">编辑</el-dropdown-item>
-                    <el-dropdown-item command="del" divided>删除</el-dropdown-item>
-                  </el-dropdown-menu>
-                </template>
-              </el-dropdown>
+              <div class="table-actions-cell">
+                <el-dropdown trigger="click" @command="(cmd) => cmd === 'edit' ? openForm(row) : del(row)">
+                  <el-button type="primary" link>操作<el-icon class="el-icon--right"><ArrowDown /></el-icon></el-button>
+                  <template #dropdown>
+                    <el-dropdown-menu>
+                      <el-dropdown-item command="edit">编辑</el-dropdown-item>
+                      <el-dropdown-item command="del" divided>删除</el-dropdown-item>
+                    </el-dropdown-menu>
+                  </template>
+                </el-dropdown>
+              </div>
             </template>
           </el-table-column>
         </el-table>

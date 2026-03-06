@@ -3,6 +3,7 @@ package com.pms.service;
 import com.pms.entity.SysUser;
 import com.pms.mapper.SysUserMapper;
 import com.pms.mapper.SysMenuMapper;
+import com.pms.mapper.SysRoleMapper;
 import com.pms.entity.SysMenu;
 import com.pms.security.JwtUtil;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,13 +19,15 @@ public class AuthService {
 
     private final SysUserMapper userMapper;
     private final SysMenuMapper menuMapper;
+    private final SysRoleMapper roleMapper;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
-    public AuthService(SysUserMapper userMapper, SysMenuMapper menuMapper,
+    public AuthService(SysUserMapper userMapper, SysMenuMapper menuMapper, SysRoleMapper roleMapper,
                        PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
         this.userMapper = userMapper;
         this.menuMapper = menuMapper;
+        this.roleMapper = roleMapper;
         this.passwordEncoder = passwordEncoder;
         this.jwtUtil = jwtUtil;
     }
@@ -46,6 +49,8 @@ public class AuthService {
         result.put("username", user.getUsername());
         result.put("realName", user.getRealName() != null ? user.getRealName() : user.getUsername());
         result.put("menus", menuList);
+        List<String> roleCodes = roleMapper.selectCodesByUserId(user.getId());
+        result.put("roleCodes", roleCodes != null ? roleCodes : List.of());
         return result;
     }
 
@@ -59,6 +64,8 @@ public class AuthService {
         result.put("username", user.getUsername());
         result.put("realName", user.getRealName() != null ? user.getRealName() : user.getUsername());
         result.put("menus", menuList);
+        List<String> roleCodes = roleMapper.selectCodesByUserId(userId);
+        result.put("roleCodes", roleCodes != null ? roleCodes : List.of());
         return result;
     }
 

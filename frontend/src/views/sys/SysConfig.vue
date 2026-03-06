@@ -15,11 +15,13 @@
             <el-table-column prop="status" label="状态" width="80">
               <template #default="{ row }">{{ row.status === 1 ? '启用' : '禁用' }}</template>
             </el-table-column>
-            <el-table-column label="操作" width="180">
+            <el-table-column label="操作" width="200" align="center">
               <template #default="{ row }">
-                <el-button link type="primary" @click="openUserForm(row)">编辑</el-button>
-                <el-button link type="primary" @click="openUserRoles(row)">分配角色</el-button>
-                <el-button link type="danger" @click="deleteUser(row)" :disabled="row.username === 'admin'">删除</el-button>
+                <div class="table-actions-cell">
+                  <el-button link type="primary" @click="openUserForm(row)">编辑</el-button>
+                  <el-button link type="primary" @click="openUserRoles(row)">分配角色</el-button>
+                  <el-button link type="danger" @click="deleteUser(row)" :disabled="row.username === 'admin'">删除</el-button>
+                </div>
               </template>
             </el-table-column>
           </el-table>
@@ -33,11 +35,13 @@
             <el-table-column prop="status" label="状态" width="80">
               <template #default="{ row }">{{ row.status === 1 ? '启用' : '禁用' }}</template>
             </el-table-column>
-            <el-table-column label="操作" width="180">
+            <el-table-column label="操作" width="200" align="center">
               <template #default="{ row }">
-                <el-button link type="primary" @click="openRoleForm(row)">编辑</el-button>
-                <el-button link type="primary" @click="openRoleMenus(row)">分配菜单</el-button>
-                <el-button link type="danger" @click="deleteRole(row)">删除</el-button>
+                <div class="table-actions-cell">
+                  <el-button link type="primary" @click="openRoleForm(row)">编辑</el-button>
+                  <el-button link type="primary" @click="openRoleMenus(row)">分配菜单</el-button>
+                  <el-button link type="danger" @click="deleteRole(row)">删除</el-button>
+                </div>
               </template>
             </el-table-column>
           </el-table>
@@ -47,11 +51,13 @@
           <el-table :data="dictTypes" style="margin-top:12px">
             <el-table-column prop="code" label="编码" width="120" />
             <el-table-column prop="name" label="名称" />
-            <el-table-column label="操作" width="180">
+            <el-table-column label="操作" width="200" align="center">
               <template #default="{ row }">
-                <el-button link type="primary" @click="openDictTypeForm(row)">编辑</el-button>
-                <el-button link type="primary" @click="openDictItemList(row)">字典项</el-button>
-                <el-button link type="danger" @click="deleteDictType(row)">删除</el-button>
+                <div class="table-actions-cell">
+                  <el-button link type="primary" @click="openDictTypeForm(row)">编辑</el-button>
+                  <el-button link type="primary" @click="openDictItemList(row)">字典项</el-button>
+                  <el-button link type="danger" @click="deleteDictType(row)">删除</el-button>
+                </div>
               </template>
             </el-table-column>
           </el-table>
@@ -61,10 +67,12 @@
               <el-table-column prop="itemKey" label="键" width="120" />
               <el-table-column prop="itemValue" label="值" />
               <el-table-column prop="sortOrder" label="排序" width="80" />
-              <el-table-column label="操作" width="100">
+              <el-table-column label="操作" width="120" align="center">
                 <template #default="{ row }">
-                  <el-button link type="primary" @click="openDictItemForm(row)">编辑</el-button>
-                  <el-button link type="danger" @click="deleteDictItem(row.id)">删除</el-button>
+                  <div class="table-actions-cell">
+                    <el-button link type="primary" @click="openDictItemForm(row)">编辑</el-button>
+                    <el-button link type="danger" @click="deleteDictItem(row.id)">删除</el-button>
+                  </div>
                 </template>
               </el-table-column>
             </el-table>
@@ -88,10 +96,12 @@
             <el-table-column prop="code" label="流程编码" width="120" />
             <el-table-column prop="name" label="流程名称" />
             <el-table-column prop="bizType" label="业务类型" width="100" />
-            <el-table-column label="操作" width="140">
+            <el-table-column label="操作" width="130" align="center">
               <template #default="{ row }">
-                <el-button link type="primary" @click="openFlowForm(row)">编辑</el-button>
-                <el-button link type="danger" @click="deleteFlow(row)">删除</el-button>
+                <div class="table-actions-cell">
+                  <el-button link type="primary" @click="openFlowForm(row)">编辑</el-button>
+                  <el-button link type="danger" @click="deleteFlow(row)">删除</el-button>
+                </div>
               </template>
             </el-table-column>
           </el-table>
@@ -103,10 +113,12 @@
             <el-table-column prop="formCode" label="表单编码" width="120" />
             <el-table-column prop="formName" label="表单名称" />
             <el-table-column prop="bizType" label="业务类型" width="100" />
-            <el-table-column label="操作" width="140">
+            <el-table-column label="操作" width="130" align="center">
               <template #default="{ row }">
-                <el-button link type="primary" @click="openFormConfigForm(row)">编辑</el-button>
-                <el-button link type="danger" @click="deleteFormConfig(row)">删除</el-button>
+                <div class="table-actions-cell">
+                  <el-button link type="primary" @click="openFormConfigForm(row)">编辑</el-button>
+                  <el-button link type="danger" @click="deleteFormConfig(row)">删除</el-button>
+                </div>
               </template>
             </el-table-column>
           </el-table>
@@ -134,10 +146,12 @@
             <el-table-column prop="tabName" label="页签名称" />
             <el-table-column prop="tabPath" label="路径" />
             <el-table-column prop="sortOrder" label="排序" width="80" />
-            <el-table-column label="操作" width="140">
+            <el-table-column label="操作" width="130" align="center">
               <template #default="{ row }">
-                <el-button link type="primary" @click="openTabForm(row)">编辑</el-button>
-                <el-button link type="danger" @click="deleteTab(row)">删除</el-button>
+                <div class="table-actions-cell">
+                  <el-button link type="primary" @click="openTabForm(row)">编辑</el-button>
+                  <el-button link type="danger" @click="deleteTab(row)">删除</el-button>
+                </div>
               </template>
             </el-table-column>
           </el-table>
@@ -232,8 +246,12 @@
             <el-table-column prop="approverId" label="审批人ID">
               <template #default="{ row }"><el-input v-model="row.approverId" placeholder="角色ID或用户ID" size="small" /></template>
             </el-table-column>
-            <el-table-column label="操作" width="80">
-              <template #default="{ $index }"><el-button link type="danger" size="small" @click="flowNodes.splice($index, 1)">删除</el-button></template>
+            <el-table-column label="操作" width="80" align="center">
+              <template #default="{ $index }">
+                <div class="table-actions-cell">
+                  <el-button link type="danger" size="small" @click="flowNodes.splice($index, 1)">删除</el-button>
+                </div>
+              </template>
             </el-table-column>
           </el-table>
         </el-form-item>
@@ -281,8 +299,12 @@
             <el-table-column prop="listWidth" label="列宽" width="70">
               <template #default="{ row }"><el-input v-model="row.listWidth" size="small" placeholder="120" /></template>
             </el-table-column>
-            <el-table-column label="操作" width="56">
-              <template #default="{ $index }"><el-button link type="danger" size="small" @click="formFields.splice($index, 1)">删</el-button></template>
+            <el-table-column label="操作" width="64" align="center">
+              <template #default="{ $index }">
+                <div class="table-actions-cell">
+                  <el-button link type="danger" size="small" @click="formFields.splice($index, 1)">删</el-button>
+                </div>
+              </template>
             </el-table-column>
           </el-table>
         </el-form-item>

@@ -11,7 +11,7 @@
           <el-option label="已结项" value="closed" />
         </el-select>
         <el-button type="primary" @click="fetchList">查询</el-button>
-        <el-button type="primary" @click="openForm()">新增项目</el-button>
+        <el-button v-if="isAdmin" type="primary" @click="openForm()">新增项目</el-button>
       </div>
     </template>
     <el-table v-loading="loading" :data="list" stripe>
@@ -28,17 +28,19 @@
       <el-table-column label="状态" width="90">
         <template #default="{ row }">{{ projectStatusMap[row?.status] ?? row?.status ?? '-' }}</template>
       </el-table-column>
-      <el-table-column label="操作" width="80" fixed="right" align="center">
+      <el-table-column v-if="isAdmin" label="操作" width="90" fixed="right" align="center">
         <template #default="{ row }">
-          <el-dropdown trigger="click" @command="(cmd) => cmd === 'edit' ? openForm(row) : handleDelete(row)">
-            <el-button type="primary" link>操作<el-icon class="el-icon--right"><ArrowDown /></el-icon></el-button>
-            <template #dropdown>
-              <el-dropdown-menu>
-                <el-dropdown-item command="edit">编辑</el-dropdown-item>
-                <el-dropdown-item command="del" divided>删除</el-dropdown-item>
-              </el-dropdown-menu>
-            </template>
-          </el-dropdown>
+          <div class="table-actions-cell">
+            <el-dropdown trigger="click" @command="(cmd) => cmd === 'edit' ? openForm(row) : handleDelete(row)">
+              <el-button type="primary" link>操作<el-icon class="el-icon--right"><ArrowDown /></el-icon></el-button>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item command="edit">编辑</el-dropdown-item>
+                  <el-dropdown-item command="del" divided>删除</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+          </div>
         </template>
       </el-table-column>
     </el-table>
@@ -90,13 +92,16 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { ArrowDown } from '@element-plus/icons-vue'
+import { useUserStore } from '@/store/user'
 import { projectPage, projectSave, projectUpdate, projectDelete } from '@/api/project'
 
 const router = useRouter()
+const userStore = useUserStore()
+const isAdmin = computed(() => userStore.username === 'admin')
 const loading = ref(false)
 const projectStatusMap = {
   planning: '规划',

@@ -32,9 +32,14 @@
     <el-container class="right-wrap">
       <el-header class="header">
         <span class="title">{{ pageTitle }}</span>
-        <el-dropdown trigger="click" @command="handleUserCommand" class="user-dropdown">
+        <div class="header-right">
+          <el-button type="primary" link class="header-ai-btn" @click="onAiAssistantClick">
+            <el-icon><MagicStick /></el-icon>
+            <span>AI开发助手</span>
+          </el-button>
+          <el-dropdown trigger="click" @command="handleUserCommand" class="user-dropdown">
           <div class="user-wrap">
-            <el-avatar :size="36" :src="userStore.avatar" class="header-avatar">
+            <el-avatar :key="(userStore.userId ?? '') + (userStore.avatar ?? '')" :size="28" :src="avatarSrc" class="header-avatar">
               {{ avatarText }}
             </el-avatar>
             <span class="user-name">{{ displayName }}</span>
@@ -42,12 +47,12 @@
           </div>
           <template #dropdown>
             <el-dropdown-menu>
-              <el-dropdown-item command="avatar">修改头像</el-dropdown-item>
               <el-dropdown-item command="password">修改密码</el-dropdown-item>
               <el-dropdown-item command="logout" divided>退出</el-dropdown-item>
             </el-dropdown-menu>
           </template>
         </el-dropdown>
+        </div>
       </el-header>
       <el-main class="main">
         <ErrorBoundary>
@@ -57,19 +62,40 @@
     </el-container>
   </el-container>
 
-  <!-- 修改头像 -->
-  <el-dialog v-model="avatarDialogVisible" title="修改头像" width="400px" @close="onAvatarDialogClose">
-    <div class="avatar-upload-wrap">
-      <input ref="avatarInputRef" type="file" accept="image/*" class="avatar-input" @change="onAvatarFileChange" />
-      <el-button type="primary" @click="avatarInputRef?.click()">选择本地图片</el-button>
-      <div v-if="avatarPreview" class="avatar-preview">
-        <el-avatar :size="80" :src="avatarPreview" />
+  <!-- AI开发助手 聊天框 -->
+  <el-dialog
+    v-model="aiChatVisible"
+    title="AI开发助手"
+    width="480px"
+    class="ai-chat-dialog"
+    :close-on-click-modal="true"
+    destroy-on-close
+    @closed="aiChatInput = ''"
+  >
+    <div class="ai-chat-body">
+      <div class="ai-chat-messages">
+        <div class="ai-chat-msg ai-chat-msg--assistant">
+          <div class="ai-chat-msg-avatar">杰</div>
+          <div class="ai-chat-msg-content">
+            <div class="ai-chat-msg-name">小杰</div>
+            <div class="ai-chat-msg-text">{{ aiGreeting }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="ai-chat-footer">
+        <el-input
+          v-model="aiChatInput"
+          type="textarea"
+          :rows="2"
+          placeholder="输入您的要求，如：生成登录接口、部署说明..."
+          maxlength="500"
+          show-word-limit
+          class="ai-chat-input"
+          @keydown.enter.ctrl="sendAiMessage"
+        />
+        <el-button type="primary" class="ai-chat-send" :disabled="!aiChatInput.trim()" @click="sendAiMessage">发送</el-button>
       </div>
     </div>
-    <template #footer>
-      <el-button @click="avatarDialogVisible = false">取消</el-button>
-      <el-button type="primary" :disabled="!avatarPreview" @click="confirmAvatar">确定</el-button>
-    </template>
   </el-dialog>
 
   <!-- 修改密码 -->
@@ -97,7 +123,7 @@ import { computed, onMounted, ref, reactive } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useUserStore } from '@/store/user'
-import { List, Folder, Money, Warning, Edit, Flag, Setting, User, OfficeBuilding, ArrowDown } from '@element-plus/icons-vue'
+import { List, Folder, Money, Warning, Edit, Flag, Setting, User, OfficeBuilding, ArrowDown, MagicStick } from '@element-plus/icons-vue'
 import { changePassword } from '@/api/auth'
 import ErrorBoundary from '@/components/ErrorBoundary.vue'
 
@@ -146,6 +172,10 @@ const menuItems = computed(() => {
 })
 
 const displayName = computed(() => userStore.realName || userStore.username || '未登录')
+const avatarSrc = computed(() => {
+  const v = userStore.avatar
+  return (v && typeof v === 'string' && v.trim()) ? v : undefined
+})
 /** 头像无图时显示的首字（中文取首字，英文取首字母） */
 const avatarText = computed(() => {
   const name = (userStore.realName || userStore.username || '').trim()
@@ -172,52 +202,30 @@ const pageTitle = computed(() => {
   return fallback[path] || '项目管理系统'
 })
 
+const aiChatVisible = ref(false)
+const aiChatInput = ref('')
+const aiGreeting = '您好，我是AI开发工程师小杰，您可以提出您的要求，我可以根据要求生成前后端代码，及部署，完全符合开发工程学，'
+
+function onAiAssistantClick() {
+  aiChatVisible.value = true
+}
+
+function sendAiMessage() {
+  const text = aiChatInput.value?.trim()
+  if (!text) return
+  ElMessage.info('对话能力即将开放，敬请期待')
+  aiChatInput.value = ''
+}
+
 function handleUserCommand(command) {
   if (command === 'logout') {
     logout()
-    return
-  }
-  if (command === 'avatar') {
-    avatarPreview.value = ''
-    avatarFile = null
-    if (avatarInputRef.value) avatarInputRef.value.value = ''
-    avatarDialogVisible.value = true
     return
   }
   if (command === 'password') {
     passwordDialogVisible.value = true
     return
   }
-}
-
-// 修改头像
-const avatarDialogVisible = ref(false)
-const avatarInputRef = ref(null)
-const avatarPreview = ref('')
-let avatarFile = null
-
-function onAvatarDialogClose() {
-  avatarPreview.value = ''
-  avatarFile = null
-}
-
-function onAvatarFileChange(e) {
-  const file = e.target.files?.[0]
-  if (!file || !file.type.startsWith('image/')) {
-    ElMessage.warning('请选择图片文件')
-    return
-  }
-  avatarFile = file
-  const reader = new FileReader()
-  reader.onload = () => { avatarPreview.value = reader.result }
-  reader.readAsDataURL(file)
-}
-
-function confirmAvatar() {
-  if (!avatarPreview.value) return
-  userStore.setAvatar(avatarPreview.value)
-  ElMessage.success('头像已更新')
-  avatarDialogVisible.value = false
 }
 
 // 修改密码
@@ -343,6 +351,20 @@ function logout() {
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.header-ai-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--primary-start);
+}
+.header-ai-btn:hover { color: var(--tech-purple); }
 .user-dropdown { cursor: pointer; }
 .user-wrap {
   display: flex;
@@ -368,7 +390,44 @@ function logout() {
   padding: 0.2cm;
   overflow: auto;
 }
-.avatar-input { display: none; }
-.avatar-upload-wrap { display: flex; flex-direction: column; align-items: center; gap: 16px; }
-.avatar-preview { margin-top: 8px; }
+/* AI 聊天框 */
+.ai-chat-dialog .el-dialog__body { padding: 0; max-height: 70vh; }
+.ai-chat-body { display: flex; flex-direction: column; min-height: 320px; }
+.ai-chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  min-height: 200px;
+}
+.ai-chat-msg {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.ai-chat-msg--assistant .ai-chat-msg-content { background: linear-gradient(135deg, rgba(14,165,233,0.08), rgba(124,58,237,0.06)); border-radius: 12px; padding: 12px 14px; }
+.ai-chat-msg-avatar {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--tech-cyan), var(--tech-purple));
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ai-chat-msg-name { font-size: 0.75rem; font-weight: 600; color: var(--tech-purple); margin-bottom: 4px; }
+.ai-chat-msg-text { font-size: 0.875rem; line-height: 1.6; color: var(--text-primary); white-space: pre-wrap; word-break: break-word; }
+.ai-chat-footer {
+  padding: 12px 16px;
+  border-top: 1px solid var(--border-light);
+  background: var(--bg-header);
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+}
+.ai-chat-input { flex: 1; }
+.ai-chat-send { flex-shrink: 0; }
 </style>

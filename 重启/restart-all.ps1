@@ -1,8 +1,8 @@
 # 重启前后端服务（先停 8080、5173，再分别在新窗口启动后端和前端）
-# 用法：在项目根目录或 D:\PMS系统代码 下，PowerShell 执行 .\restart-all.ps1
+# 用法：在 D:\PMS系统代码\重启 下执行 .\restart-all.ps1
 
 $ErrorActionPreference = "SilentlyContinue"
-$root = if ($PSScriptRoot) { $PSScriptRoot } else { Get-Location }
+$root = Split-Path $PSScriptRoot -Parent
 $backendDir = Join-Path $root "backend"
 $frontendDir = Join-Path $root "frontend"
 
@@ -29,5 +29,4 @@ if (Test-Path (Join-Path $frontendDir "package.json")) {
     Write-Host "未找到 frontend/package.json" -ForegroundColor Red
 }
 
-Write-Host ""
-Write-Host "Done. Check the new windows for logs." -ForegroundColor Cyan
+Write-Host "完成。请在新打开的窗口中查看运行日志。" -ForegroundColor Cyan

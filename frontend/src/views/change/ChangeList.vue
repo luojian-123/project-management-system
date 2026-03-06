@@ -3,7 +3,7 @@
     <el-card>
     <template #header>
       <span>变更管理</span>
-      <el-button type="primary" @click="openForm()">新增</el-button>
+      <el-button v-if="isAdmin" type="primary" @click="openForm()">新增</el-button>
     </template>
     <el-table v-loading="loading" :data="list" stripe>
       <el-table-column label="标题" min-width="160">
@@ -17,17 +17,19 @@
         <template #default="{ row }">{{ changeStatusMap[row?.status] ?? row?.status ?? '-' }}</template>
       </el-table-column>
       <el-table-column prop="createdAt" label="创建时间" width="170" />
-      <el-table-column label="操作" width="80" fixed="right" align="center">
+      <el-table-column v-if="isAdmin" label="操作" width="90" fixed="right" align="center">
         <template #default="{ row }">
-          <el-dropdown trigger="click" @command="(cmd) => cmd === 'edit' ? openForm(row) : handleDelete(row)">
-            <el-button type="primary" link>操作<el-icon class="el-icon--right"><ArrowDown /></el-icon></el-button>
-            <template #dropdown>
-              <el-dropdown-menu>
-                <el-dropdown-item command="edit">编辑</el-dropdown-item>
-                <el-dropdown-item command="del" divided>删除</el-dropdown-item>
-              </el-dropdown-menu>
-            </template>
-          </el-dropdown>
+          <div class="table-actions-cell">
+            <el-dropdown trigger="click" @command="(cmd) => cmd === 'edit' ? openForm(row) : handleDelete(row)">
+              <el-button type="primary" link>操作<el-icon class="el-icon--right"><ArrowDown /></el-icon></el-button>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item command="edit">编辑</el-dropdown-item>
+                  <el-dropdown-item command="del" divided>删除</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+          </div>
         </template>
       </el-table-column>
     </el-table>
@@ -70,11 +72,14 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { ArrowDown } from '@element-plus/icons-vue'
+import { useUserStore } from '@/store/user'
 import { changePage, changeSave, changeUpdate, changeDelete } from '@/api/change'
 
+const userStore = useUserStore()
+const isAdmin = computed(() => userStore.username === 'admin')
 const loading = ref(false)
 const changeStatusMap = { pending: '待审批', approved: '已通过', rejected: '已拒绝' }
 const list = ref([])
@@ -102,6 +107,7 @@ async function fetchList() {
 }
 
 function openForm(row) {
+  if (!isAdmin.value) return
   if (row) Object.assign(form, { id: row.id, title: row.title, projectId: row.projectId, changeType: row.changeType, status: row.status })
   else Object.assign(form, { id: null, title: '', projectId: null, changeType: '', status: 'pending' })
   dialogVisible.value = true

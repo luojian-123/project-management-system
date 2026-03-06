@@ -7,9 +7,11 @@ import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import App from './App.vue'
 import router from './router'
 import PageCard from './components/PageCard.vue'
+import DraggableCardList from './components/DraggableCardList.vue'
 
 const app = createApp(App)
 app.component('PageCard', PageCard)
+app.component('DraggableCardList', DraggableCardList)
 const pinia = createPinia()
 app.use(pinia)
 app.use(router)

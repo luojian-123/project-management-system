@@ -17,9 +17,10 @@
         <template #default="{ row }">{{ riskStatusMap[row?.status] ?? row?.status ?? '-' }}</template>
       </el-table-column>
       <el-table-column prop="createdAt" label="创建时间" width="170" />
-      <el-table-column label="操作" width="80" fixed="right" align="center">
+      <el-table-column label="操作" width="90" fixed="right" align="center">
         <template #default="{ row }">
-          <el-dropdown trigger="click" @command="(cmd) => cmd === 'edit' ? openForm(row) : handleDelete(row)">
+          <div class="table-actions-cell">
+            <el-dropdown trigger="click" @command="(cmd) => cmd === 'edit' ? openForm(row) : handleDelete(row)">
             <el-button type="primary" link>操作<el-icon class="el-icon--right"><ArrowDown /></el-icon></el-button>
             <template #dropdown>
               <el-dropdown-menu>
@@ -28,6 +29,7 @@
               </el-dropdown-menu>
             </template>
           </el-dropdown>
+          </div>
         </template>
       </el-table-column>
     </el-table>

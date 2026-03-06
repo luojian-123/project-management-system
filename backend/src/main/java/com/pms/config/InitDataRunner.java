@@ -45,6 +45,14 @@ public class InitDataRunner implements CommandLineRunner {
         );
         try { jdbcTemplate.execute("ALTER TABLE sys_role ADD COLUMN dept_id BIGINT NULL"); } catch (Exception ignored) {}
         try { jdbcTemplate.execute("ALTER TABLE sys_role ADD COLUMN sort_order INT DEFAULT 0"); } catch (Exception ignored) {}
+        try {
+            jdbcTemplate.execute(
+                "CREATE TABLE IF NOT EXISTS sys_role_dept (role_id BIGINT NOT NULL, dept_id BIGINT NOT NULL, PRIMARY KEY (role_id, dept_id))"
+            );
+            jdbcTemplate.update(
+                "INSERT IGNORE INTO sys_role_dept (role_id, dept_id) SELECT id, dept_id FROM sys_role WHERE dept_id IS NOT NULL"
+            );
+        } catch (Exception ignored) {}
 
         jdbcTemplate.execute(
             "CREATE TABLE IF NOT EXISTS pm_task (" +
@@ -87,6 +95,22 @@ public class InitDataRunner implements CommandLineRunner {
                 jdbcTemplate.update("INSERT IGNORE INTO sys_user_role (user_id, role_id) SELECT ?, id FROM sys_role WHERE code = 'ADMIN' LIMIT 1", userId);
                 jdbcTemplate.update("INSERT IGNORE INTO sys_role_menu (role_id, menu_id) SELECT (SELECT id FROM sys_role WHERE code = 'ADMIN' LIMIT 1), id FROM sys_menu");
             }
+        }
+        // 初始化系统角色「财务」：对成本管理有增删改查权限（拥有成本管理菜单）
+        try {
+            Integer financeExists = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM sys_role WHERE code = 'FINANCE'", Integer.class);
+            if (financeExists == null || financeExists == 0) {
+                jdbcTemplate.update("INSERT INTO sys_role (code, name, status, sort_order) VALUES ('FINANCE', '财务', 1, 10)");
+            }
+            Integer costMenuExists = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM sys_menu WHERE path = '/cost'", Integer.class);
+            if (costMenuExists == null || costMenuExists == 0) {
+                jdbcTemplate.update("INSERT INTO sys_menu (parent_id, name, path, component, permission, type, sort_order, icon, status) VALUES (0, '成本管理', '/cost', NULL, NULL, 1, 3, 'Money', 1)");
+            }
+            jdbcTemplate.update(
+                "INSERT IGNORE INTO sys_role_menu (role_id, menu_id) SELECT r.id, m.id FROM sys_role r, sys_menu m WHERE r.code = 'FINANCE' AND m.path = '/cost'"
+            );
+        } catch (Exception e) {
+            // 表或数据可能尚未就绪，忽略
         }
     }
 }

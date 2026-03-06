@@ -37,10 +37,12 @@
         <el-table-column prop="status" label="状态" width="90">
           <template #default="{ row }">{{ taskStatusMap[row.status] || row.status }}</template>
         </el-table-column>
-        <el-table-column label="操作" width="160" fixed="right">
+        <el-table-column label="操作" width="130" fixed="right">
           <template #default="{ row }">
-            <el-button link type="primary" @click="openTaskForm(row)">编辑</el-button>
-            <el-button link type="danger" @click="delTask(row)" v-if="!row.children?.length">删除</el-button>
+            <div class="table-actions-cell">
+              <el-button link type="primary" @click="openTaskForm(row)">编辑</el-button>
+              <el-button link type="danger" @click="delTask(row)" v-if="!row.children?.length">删除</el-button>
+            </div>
           </template>
         </el-table-column>
       </el-table>
