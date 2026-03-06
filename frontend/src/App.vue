@@ -60,9 +60,9 @@ body {
 
 /* ========== 内容区与卡片（统一页面宽度与组件距离） ========== */
 .page {
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 0 var(--space-page);
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
 }
 .page > .el-row { margin-bottom: 0; }
 .page > .el-row + .el-row,
@@ -318,6 +318,21 @@ body {
 .el-popper.is-light .el-popper__arrow::before {
   border: 1px solid var(--border-light);
   background: #fff;
+}
+
+/* ========== 表格内「操作」下拉按钮：加粗、浅黑、适配布局 ========== */
+.el-table .el-dropdown .el-button.el-button--primary.is-link {
+  font-weight: 600 !important;
+  color: #262626 !important;
+  padding: 4px 8px !important;
+  min-height: auto !important;
+}
+.el-table .el-dropdown .el-button.el-button--primary.is-link:hover {
+  color: #000 !important;
+}
+.el-table .el-dropdown .el-button.el-button--primary.is-link .el-icon--right {
+  margin-left: 2px;
+  color: inherit;
 }
 
 /* ========== 链接与可点击名称 ========== */

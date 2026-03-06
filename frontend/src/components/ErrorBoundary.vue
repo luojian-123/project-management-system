@@ -15,7 +15,8 @@ const errorMessage = ref('')
 
 onErrorCaptured((err, instance, info) => {
   error.value = err
-  errorMessage.value = err?.message || String(err)
+  const msg = err?.message ?? err?.msg
+  errorMessage.value = msg || (err && typeof err === 'object' ? (err.response?.data?.message || JSON.stringify(err).slice(0, 200)) : String(err))
   console.error('[ErrorBoundary]', err, info)
   return false
 })

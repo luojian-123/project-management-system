@@ -26,7 +26,6 @@
           <el-menu-item index="/change"><el-icon><Edit /></el-icon><span>变更管理</span></el-menu-item>
           <el-menu-item index="/risk"><el-icon><Flag /></el-icon><span>风险管理</span></el-menu-item>
           <el-menu-item index="/org"><el-icon><OfficeBuilding /></el-icon><span>组织管理</span></el-menu-item>
-          <el-menu-item index="/sys"><el-icon><Setting /></el-icon><span>系统配置</span></el-menu-item>
         </template>
       </el-menu>
     </el-aside>
@@ -119,8 +118,7 @@ const defaultMenus = [
   { path: '/issue', name: '问题管理', icon: 'Warning' },
   { path: '/change', name: '变更管理', icon: 'Edit' },
   { path: '/risk', name: '风险管理', icon: 'Flag' },
-  { path: '/org', name: '组织管理', icon: 'OfficeBuilding' },
-  { path: '/sys', name: '系统配置', icon: 'Setting' }
+  { path: '/org', name: '组织管理', icon: 'OfficeBuilding' }
 ]
 
 const menuItems = computed(() => {
@@ -170,7 +168,7 @@ const pageTitle = computed(() => {
   if (path.startsWith('/project/')) return '项目详情'
   if (path.startsWith('/task/')) return '任务详情'
   if (path.startsWith('/model/')) return byPath['/model/' + route.params.formCode] || '对象管理'
-  const fallback = { '/todo': '个人待办', '/project': '项目管理', '/cost': '成本管理', '/issue': '问题管理', '/change': '变更管理', '/risk': '风险管理', '/org': '组织管理', '/sys': '系统配置' }
+  const fallback = { '/todo': '个人待办', '/project': '项目管理', '/cost': '成本管理', '/issue': '问题管理', '/change': '变更管理', '/risk': '风险管理', '/org': '组织管理' }
   return fallback[path] || '项目管理系统'
 })
 
@@ -367,7 +365,7 @@ function logout() {
 .main {
   flex: 1;
   background: var(--bg-main);
-  padding: 24px;
+  padding: 0.2cm;
   overflow: auto;
 }
 .avatar-input { display: none; }

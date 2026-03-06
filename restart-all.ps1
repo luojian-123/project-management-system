@@ -29,4 +29,5 @@ if (Test-Path (Join-Path $frontendDir "package.json")) {
     Write-Host "未找到 frontend/package.json" -ForegroundColor Red
 }
 
-Write-Host "`n完成。请在新打开的窗口中查看运行日志。" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "Done. Check the new windows for logs." -ForegroundColor Cyan

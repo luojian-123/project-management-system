@@ -31,7 +31,6 @@ const routes = [
             }
           })
       },
-      { path: 'sys', name: 'Sys', component: () => import('@/views/sys/SysConfig.vue') },
       { path: 'model/:formCode', name: 'DynamicModel', component: () => import('@/views/model/DynamicModelPage.vue'), meta: { titleFromConfig: true } }
     ]
   }

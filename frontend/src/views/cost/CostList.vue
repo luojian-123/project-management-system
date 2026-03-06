@@ -93,7 +93,10 @@ const form = reactive({
   occurDate: '',
   remark: ''
 })
-const rules = {}
+const rules = {
+  projectId: [{ required: true, message: '请选择或输入项目', trigger: 'blur' }],
+  costType: [{ required: true, message: '请输入成本类型', trigger: 'blur' }]
+}
 
 async function fetchList() {
   loading.value = true
@@ -119,7 +122,12 @@ function openForm(row) {
 }
 
 async function submitForm() {
-  await formRef.value?.validate().catch(() => {})
+  try {
+    await formRef.value?.validate()
+  } catch {
+    ElMessage.warning('请完善必填项后再提交')
+    return
+  }
   submitLoading.value = true
   try {
     if (form.id) await costUpdate(form)
@@ -127,6 +135,9 @@ async function submitForm() {
     ElMessage.success('保存成功')
     dialogVisible.value = false
     fetchList()
+  } catch (e) {
+    const msg = e?.response?.data?.message ?? e?.message ?? e?.msg ?? '保存失败，请检查网络或后端'
+    ElMessage.error(msg)
   } finally {
     submitLoading.value = false
   }

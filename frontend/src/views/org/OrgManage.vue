@@ -9,7 +9,7 @@
             <el-button type="primary" link @click="loadTree">刷新</el-button>
           </div>
         </template>
-        <div v-loading="treeLoading">
+        <div v-loading="treeLoading" @contextmenu.prevent>
           <el-tree
             :data="treeData"
             node-key="nodeKey"
@@ -27,9 +27,10 @@
         <template #header>
           <span>节点详情</span>
           <div style="display:flex; gap:8px">
-            <el-button type="primary" @click="openCompanyForm()">新增公司</el-button>
+            <el-button v-if="currentNode?.type !== 'role'" type="primary" @click="openCompanyForm()">新增公司</el-button>
             <el-button v-if="currentNode?.type === 'company'" type="primary" @click="openDeptForm(null, currentNode.id)">新增部门</el-button>
             <el-button v-if="currentNode?.type === 'dept'" type="primary" @click="openRoleForm(null, currentNode.id)">新增角色</el-button>
+            <el-button v-if="currentNode?.type === 'role'" type="primary" @click="openUserForm()">新增用户</el-button>
           </div>
         </template>
 
@@ -108,6 +109,33 @@
       <el-button type="primary" :loading="submitLoading" @click="submitRole">确定</el-button>
     </template>
   </el-dialog>
+
+  <!-- 分配用户到当前角色 -->
+  <el-dialog v-model="userVisible" title="新增用户（分配至本角色）" width="480px" @close="userForm.userId = null">
+    <el-form label-width="90px">
+      <el-form-item label="选择用户" required>
+        <el-select
+          v-model="userForm.userId"
+          filterable
+          placeholder="搜索用户名/姓名"
+          style="width:100%"
+          :loading="userListLoading"
+          @focus="loadUserList"
+        >
+          <el-option
+            v-for="u in userList"
+            :key="u.id"
+            :label="(u.realName || u.username) + (u.username ? ' (' + u.username + ')' : '')"
+            :value="u.id"
+          />
+        </el-select>
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <el-button @click="userVisible = false">取消</el-button>
+      <el-button type="primary" :loading="submitLoading" :disabled="!userForm.userId" @click="submitUserRole">确定</el-button>
+    </template>
+  </el-dialog>
   </div>
 </template>
 
@@ -116,6 +144,7 @@ import { onMounted, reactive, ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import * as orgApi from '@/api/org'
 import { roleGet, roleSave, roleUpdate, roleDelete } from '@/api/role'
+import { userPage, getUserRoleIds, userAssignRoles } from '@/api/user'
 
 const treeData = ref([])
 const currentNode = ref(null)
@@ -180,7 +209,10 @@ function onNodeClick(node) {
 const companyVisible = ref(false)
 const companyRef = ref(null)
 const companyForm = reactive({ id: null, companyCode: '', companyName: '', sortOrder: 0 })
-const companyRules = { companyName: [{ required: true, message: '请输入公司名称', trigger: 'blur' }] }
+const companyRules = {
+  companyCode: [{ required: true, message: '请输入公司编码', trigger: 'blur' }],
+  companyName: [{ required: true, message: '请输入公司名称', trigger: 'blur' }]
+}
 
 function openCompanyForm(id) {
   Object.assign(companyForm, { id: id || null, companyCode: '', companyName: '', sortOrder: 0 })
@@ -191,7 +223,12 @@ function openCompanyForm(id) {
 }
 
 async function submitCompany() {
-  await companyRef.value?.validate()
+  try {
+    await companyRef.value?.validate()
+  } catch {
+    ElMessage.warning('请完善必填项后再提交')
+    return
+  }
   submitLoading.value = true
   try {
     if (companyForm.id) await orgApi.companyUpdate(companyForm)
@@ -199,6 +236,9 @@ async function submitCompany() {
     ElMessage.success('保存成功')
     companyVisible.value = false
     await loadTree()
+  } catch (e) {
+    const msg = e?.response?.data?.message ?? e?.message ?? e?.msg ?? '保存失败，请检查网络或后端'
+    ElMessage.error(msg)
   } finally {
     submitLoading.value = false
   }
@@ -210,6 +250,7 @@ const deptRef = ref(null)
 const deptForm = reactive({ id: null, companyId: null, deptCode: '', deptName: '', sortOrder: 0 })
 const deptRules = {
   companyId: [{ required: true, message: '请选择公司', trigger: 'change' }],
+  deptCode: [{ required: true, message: '请输入部门编码', trigger: 'blur' }],
   deptName: [{ required: true, message: '请输入部门名称', trigger: 'blur' }]
 }
 
@@ -220,7 +261,12 @@ function openDeptForm(id, companyId) {
 }
 
 async function submitDept() {
-  await deptRef.value?.validate()
+  try {
+    await deptRef.value?.validate()
+  } catch {
+    ElMessage.warning('请完善必填项后再提交')
+    return
+  }
   submitLoading.value = true
   try {
     if (deptForm.id) await orgApi.deptUpdate(deptForm)
@@ -228,6 +274,9 @@ async function submitDept() {
     ElMessage.success('保存成功')
     deptVisible.value = false
     await loadTree()
+  } catch (e) {
+    const msg = e?.response?.data?.message ?? e?.message ?? e?.msg ?? '保存失败，请检查网络或后端'
+    ElMessage.error(msg)
   } finally {
     submitLoading.value = false
   }
@@ -243,6 +292,54 @@ const roleRules = {
   name: [{ required: true, message: '请输入角色名称', trigger: 'blur' }]
 }
 
+const userVisible = ref(false)
+const userForm = reactive({ userId: null })
+const userList = ref([])
+const userListLoading = ref(false)
+
+function openUserForm() {
+  if (currentNode.value?.type !== 'role') return
+  userForm.userId = null
+  userList.value = []
+  userVisible.value = true
+}
+
+async function loadUserList() {
+  if (userList.value.length > 0) return
+  userListLoading.value = true
+  try {
+    const res = await userPage({ page: 1, size: 500 })
+    userList.value = res?.list ?? []
+  } catch {
+    userList.value = []
+  } finally {
+    userListLoading.value = false
+  }
+}
+
+async function submitUserRole() {
+  if (!userForm.userId || currentNode.value?.type !== 'role') return
+  const roleId = currentNode.value.id
+  submitLoading.value = true
+  try {
+    const curRoleIds = await getUserRoleIds(userForm.userId)
+    const ids = Array.isArray(curRoleIds) ? curRoleIds : []
+    if (ids.includes(roleId)) {
+      ElMessage.warning('该用户已拥有本角色')
+      return
+    }
+    await userAssignRoles(userForm.userId, [...ids, roleId])
+    ElMessage.success('已分配用户到本角色')
+    userVisible.value = false
+    await loadTree()
+  } catch (e) {
+    const msg = e?.response?.data?.message ?? e?.message ?? e?.msg ?? '分配失败，请检查网络或后端'
+    ElMessage.error(msg)
+  } finally {
+    submitLoading.value = false
+  }
+}
+
 function openRoleForm(id, deptId) {
   Object.assign(roleForm, { id: id || null, deptId: deptId || null, code: '', name: '', status: 1, sortOrder: 0 })
   if (id) roleGet(id).then(d => Object.assign(roleForm, d || {}))
@@ -250,7 +347,12 @@ function openRoleForm(id, deptId) {
 }
 
 async function submitRole() {
-  await roleRef.value?.validate()
+  try {
+    await roleRef.value?.validate()
+  } catch {
+    ElMessage.warning('请完善必填项后再提交')
+    return
+  }
   submitLoading.value = true
   try {
     if (roleForm.id) await roleUpdate(roleForm)
@@ -258,6 +360,9 @@ async function submitRole() {
     ElMessage.success('保存成功')
     roleVisible.value = false
     await loadTree()
+  } catch (e) {
+    const msg = e?.response?.data?.message ?? e?.message ?? e?.msg ?? '角色保存失败，请检查网络或后端'
+    ElMessage.error(msg)
   } finally {
     submitLoading.value = false
   }

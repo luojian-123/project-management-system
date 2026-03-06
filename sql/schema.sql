@@ -25,9 +25,12 @@ CREATE TABLE sys_role (
   code        VARCHAR(64) NOT NULL COMMENT '角色编码',
   name        VARCHAR(64) NOT NULL COMMENT '角色名称',
   status      TINYINT DEFAULT 1,
+  dept_id     BIGINT DEFAULT NULL COMMENT '所属部门ID',
+  sort_order  INT DEFAULT 0,
   created_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at  DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  UNIQUE KEY uk_code (code)
+  UNIQUE KEY uk_code (code),
+  KEY idx_dept_id (dept_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='角色';
 
 CREATE TABLE sys_menu (
@@ -304,6 +307,30 @@ CREATE TABLE pm_risk (
   KEY idx_project (project_id),
   KEY idx_status (status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='风险';
+
+-- ----------------------------
+-- 6. 组织（公司、部门）
+-- ----------------------------
+CREATE TABLE pm_company (
+  id           BIGINT PRIMARY KEY AUTO_INCREMENT,
+  company_code VARCHAR(64) NOT NULL COMMENT '公司编码',
+  company_name VARCHAR(128) NOT NULL COMMENT '公司名称',
+  sort_order   INT DEFAULT 0,
+  created_at   DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at   DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE KEY uk_company_code (company_code)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='公司';
+
+CREATE TABLE pm_dept (
+  id           BIGINT PRIMARY KEY AUTO_INCREMENT,
+  company_id   BIGINT NOT NULL COMMENT '所属公司ID',
+  dept_code    VARCHAR(64) NOT NULL COMMENT '部门编码',
+  dept_name    VARCHAR(128) NOT NULL COMMENT '部门名称',
+  sort_order   INT DEFAULT 0,
+  created_at   DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at   DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  KEY idx_company_id (company_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='部门';
 
 -- 初始化角色与菜单（可选）；管理员用户由应用启动时自动创建（用户名 admin 密码 123456）
 INSERT INTO sys_role (code, name) VALUES ('ADMIN', '管理员'), ('PM', '项目经理'), ('MEMBER', '成员');

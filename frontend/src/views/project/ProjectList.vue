@@ -176,7 +176,12 @@ function openForm(row) {
 }
 
 async function submitForm() {
-  await formRef.value?.validate()
+  try {
+    await formRef.value?.validate()
+  } catch {
+    ElMessage.warning('请完善必填项后再提交')
+    return
+  }
   submitLoading.value = true
   try {
     if (form.id) await projectUpdate(form)
@@ -184,6 +189,9 @@ async function submitForm() {
     ElMessage.success('保存成功')
     dialogVisible.value = false
     fetchList()
+  } catch (e) {
+    const msg = e?.response?.data?.message ?? e?.message ?? e?.msg ?? '保存失败，请检查网络或后端'
+    ElMessage.error(msg)
   } finally {
     submitLoading.value = false
   }
