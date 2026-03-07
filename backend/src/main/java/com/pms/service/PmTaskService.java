@@ -3,8 +3,10 @@ package com.pms.service;
 import com.pms.common.PageResult;
 import com.pms.entity.PmTask;
 import com.pms.entity.PmTaskChange;
+import com.pms.entity.PmTaskDeliverable;
 import com.pms.repository.PmTaskRepository;
 import com.pms.repository.PmTaskChangeRepository;
+import com.pms.repository.PmTaskDeliverableRepository;
 import com.pms.repository.SysUserRepository;
 import com.pms.entity.SysUser;
 import com.pms.config.WebConfig;
@@ -17,11 +19,13 @@ public class PmTaskService {
 
     private final PmTaskRepository taskRepository;
     private final PmTaskChangeRepository taskChangeRepository;
+    private final PmTaskDeliverableRepository deliverableRepository;
     private final SysUserRepository userRepository;
 
-    public PmTaskService(PmTaskRepository taskRepository, PmTaskChangeRepository taskChangeRepository, SysUserRepository userRepository) {
+    public PmTaskService(PmTaskRepository taskRepository, PmTaskChangeRepository taskChangeRepository, PmTaskDeliverableRepository deliverableRepository, SysUserRepository userRepository) {
         this.taskRepository = taskRepository;
         this.taskChangeRepository = taskChangeRepository;
+        this.deliverableRepository = deliverableRepository;
         this.userRepository = userRepository;
     }
 
@@ -68,6 +72,24 @@ public class PmTaskService {
 
     public List<PmTaskChange> listChangesByTaskId(Long taskId) {
         return taskChangeRepository.selectByTaskId(taskId);
+    }
+
+    public List<PmTaskDeliverable> listDeliverablesByTaskId(Long taskId) {
+        if (taskId == null) return List.of();
+        return deliverableRepository.selectByTaskId(taskId);
+    }
+
+    public void saveDeliverable(PmTaskDeliverable d) {
+        if (d.getTaskId() == null) return;
+        if (d.getId() == null) {
+            deliverableRepository.insert(d);
+        } else {
+            deliverableRepository.update(d);
+        }
+    }
+
+    public void deleteDeliverable(Long id) {
+        deliverableRepository.deleteById(id);
     }
 
     public void save(PmTask task) {

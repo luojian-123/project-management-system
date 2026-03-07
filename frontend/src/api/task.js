@@ -18,6 +18,21 @@ export function taskGetChanges(id) {
   return request.get(`/task/${id}/changes`)
 }
 
+/** 任务交付物列表 */
+export function taskGetDeliverables(taskId) {
+  return request.get(`/task/${taskId}/deliverables`)
+}
+
+/** 新增或更新交付物（有 id 为更新） */
+export function taskSaveDeliverable(data) {
+  return request.post('/task/deliverables', data)
+}
+
+/** 删除交付物 */
+export function taskDeleteDeliverable(deliverableId) {
+  return request.delete(`/task/deliverables/${deliverableId}`)
+}
+
 export function taskSave(data) {
   return request.post('/task', data)
 }

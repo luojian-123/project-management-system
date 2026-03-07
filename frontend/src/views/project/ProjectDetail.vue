@@ -1,10 +1,11 @@
 <template>
   <div class="page">
-    <el-card v-loading="projectLoading">
-      <template #header>
-        <span>项目：{{ project?.projectName }}</span>
-        <el-button link type="primary" @click="$router.push('/project')">返回列表</el-button>
-      </template>
+    <div class="page-cards" v-draggable-cards>
+      <el-card v-loading="projectLoading">
+        <template #header>
+          <span>项目：{{ project?.projectName }}</span>
+          <el-button link type="primary" @click="$router.push('/project')">返回列表</el-button>
+        </template>
       <el-descriptions :column="2" border>
         <el-descriptions-item label="项目编码">{{ project?.projectCode }}</el-descriptions-item>
         <el-descriptions-item label="状态">{{ projectStatusLabel(project?.status) }}</el-descriptions-item>
@@ -19,7 +20,7 @@
         <span>任务管理</span>
         <el-button type="primary" size="small" @click="openTaskForm()">新增任务</el-button>
       </template>
-      <el-table :data="taskList" v-loading="taskLoading" row-key="id" default-expand-all>
+      <el-table :data="taskList" v-loading="taskLoading" row-key="id" default-expand-all border>
         <el-table-column prop="taskCode" label="任务编码" min-width="90" />
         <el-table-column label="任务名称" min-width="200" show-overflow-tooltip>
           <template #default="{ row }">
@@ -37,11 +38,18 @@
         <el-table-column prop="status" label="状态" min-width="80">
           <template #default="{ row }">{{ taskStatusMap[row.status] || row.status }}</template>
         </el-table-column>
-        <el-table-column label="操作" width="130" fixed="right">
+        <el-table-column label="操作" width="100" fixed="right" align="center">
           <template #default="{ row }">
             <div class="table-actions-cell">
-              <el-button link type="primary" @click="openTaskForm(row)">编辑</el-button>
-              <el-button link type="danger" @click="delTask(row)" v-if="!row.children?.length">删除</el-button>
+              <el-dropdown trigger="click" @command="(cmd) => cmd === 'edit' ? openTaskForm(row) : delTask(row)">
+                <el-button type="primary" link>操作<el-icon class="el-icon--right"><ArrowDown /></el-icon></el-button>
+                <template #dropdown>
+                  <el-dropdown-menu>
+                    <el-dropdown-item command="edit">编辑</el-dropdown-item>
+                    <el-dropdown-item command="del" divided :disabled="!!(row.children?.length)">删除</el-dropdown-item>
+                  </el-dropdown-menu>
+                </template>
+              </el-dropdown>
             </div>
           </template>
         </el-table-column>
@@ -78,6 +86,7 @@
         </div>
       </div>
     </el-card>
+    </div>
 
     <el-dialog v-model="taskDialogVisible" :title="taskForm.id ? '编辑任务' : '新增任务'" width="520px">
       <el-form ref="taskFormRef" :model="taskForm" label-width="90px">
@@ -138,6 +147,7 @@ import { projectGet } from '@/api/project'
 import { taskListByProject, taskSave, taskDelete, taskGetDependencies, taskDependencies } from '@/api/task'
 import { userPage } from '@/api/user'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { ArrowDown } from '@element-plus/icons-vue'
 
 const route = useRoute()
 const projectId = computed(() => Number(route.params.id))

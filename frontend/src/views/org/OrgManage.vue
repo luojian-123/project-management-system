@@ -1,6 +1,7 @@
 <template>
   <div class="page">
-    <el-card>
+    <div class="page-cards" v-draggable-cards>
+      <el-card>
       <template #header>
         <span>组织树</span>
         <div class="org-card-header-actions">
@@ -95,7 +96,7 @@
                 </el-descriptions>
                 </div>
               <div v-show="detailPanelTab === 'permission' && currentNode?.type === 'role'" class="node-detail__body" v-loading="rolePermissionLoading">
-                <el-table :data="rolePermissionList" stripe max-height="100%" size="small">
+                <el-table :data="rolePermissionList" stripe max-height="100%" size="small" border>
                   <el-table-column prop="name" label="菜单名称" min-width="140" />
                   <el-table-column prop="path" label="路径" min-width="120" />
                   <el-table-column prop="assigned" label="已授权" min-width="72" align="center">
@@ -140,6 +141,7 @@
         </el-col>
       </el-row>
     </el-card>
+    </div>
 
   <!-- 公司库 抽屉 -->
   <el-drawer
@@ -153,7 +155,7 @@
       <div v-if="isAdmin" class="org-lib-drawer__toolbar">
         <el-button type="primary" size="small" @click="openCompanyForm(); companyLibVisible = false">新增公司</el-button>
       </div>
-      <el-table :data="companyList" stripe max-height="100%" class="org-lib-table">
+      <el-table :data="companyList" stripe max-height="100%" class="org-lib-table" border>
         <el-table-column prop="companyCode" label="公司编码" min-width="100" />
         <el-table-column label="公司名称" min-width="140" show-overflow-tooltip>
           <template #default="{ row }">
@@ -162,12 +164,10 @@
           </template>
         </el-table-column>
         <el-table-column prop="sortOrder" label="排序" min-width="72" align="center" />
-        <el-table-column v-if="isAdmin" label="操作" width="90" align="center" fixed="right">
+        <el-table-column v-if="isAdmin" label="操作" width="100" align="center" fixed="right">
           <template #default="{ row }">
             <el-dropdown trigger="click" :disabled="!!row.isSystem" @command="(cmd) => { if (cmd === 'edit') { openCompanyForm(row.id); companyLibVisible = false } else if (cmd === 'del') handleCompanyLibDelete(row) }">
-              <el-button type="primary" link size="small" :disabled="!!row.isSystem">
-                操作 <el-icon class="el-icon--right"><ArrowDown /></el-icon>
-              </el-button>
+              <el-button type="primary" link :disabled="!!row.isSystem">操作<el-icon class="el-icon--right"><ArrowDown /></el-icon></el-button>
               <template #dropdown>
                 <el-dropdown-menu>
                   <el-dropdown-item command="edit" :disabled="!!row.isSystem">编辑</el-dropdown-item>
@@ -188,7 +188,7 @@
       <div v-if="isAdmin" class="org-lib-drawer__toolbar">
         <el-button type="primary" size="small" @click="openDeptForm(null, null); deptLibVisible = false">新增部门</el-button>
       </div>
-      <el-table :data="deptOptionsWithCompanyName" stripe max-height="100%" class="org-lib-table">
+      <el-table :data="deptOptionsWithCompanyName" stripe max-height="100%" class="org-lib-table" border>
         <el-table-column prop="companyName" label="所属公司" min-width="100" />
         <el-table-column prop="deptCode" label="部门编码" min-width="100" />
         <el-table-column label="部门名称" min-width="120" show-overflow-tooltip>
@@ -198,12 +198,10 @@
           </template>
         </el-table-column>
         <el-table-column prop="sortOrder" label="排序" min-width="64" align="center" />
-        <el-table-column v-if="isAdmin" label="操作" width="90" align="center" fixed="right">
+        <el-table-column v-if="isAdmin" label="操作" width="100" align="center" fixed="right">
           <template #default="{ row }">
             <el-dropdown trigger="click" :disabled="!!row.isSystem" @command="(cmd) => { if (cmd === 'edit') { openDeptForm(row.id, row.companyId); deptLibVisible = false } else if (cmd === 'del') handleDeptLibDelete(row) }">
-              <el-button type="primary" link size="small" :disabled="!!row.isSystem">
-                操作 <el-icon class="el-icon--right"><ArrowDown /></el-icon>
-              </el-button>
+              <el-button type="primary" link :disabled="!!row.isSystem">操作<el-icon class="el-icon--right"><ArrowDown /></el-icon></el-button>
               <template #dropdown>
                 <el-dropdown-menu>
                   <el-dropdown-item command="edit" :disabled="!!row.isSystem">编辑</el-dropdown-item>
@@ -224,7 +222,7 @@
       <div v-if="isAdmin" class="org-lib-drawer__toolbar">
         <el-button type="primary" size="small" @click="openRoleForm(null, []); roleLibVisible = false">新增角色</el-button>
       </div>
-      <el-table v-loading="roleLibLoading" :data="roleListData" stripe max-height="100%" class="org-lib-table">
+      <el-table v-loading="roleLibLoading" :data="roleListData" stripe max-height="100%" class="org-lib-table" border>
         <el-table-column prop="code" label="角色编码" min-width="90" />
         <el-table-column prop="name" label="角色名称" min-width="100" />
         <el-table-column label="所属部门" min-width="140" show-overflow-tooltip>
@@ -234,16 +232,14 @@
           <template #default="{ row }">{{ row.status === 1 ? '启用' : '禁用' }}</template>
         </el-table-column>
         <el-table-column prop="sortOrder" label="排序" min-width="64" align="center" />
-        <el-table-column v-if="isAdmin" label="操作" width="90" align="center" fixed="right">
+        <el-table-column v-if="isAdmin" label="操作" width="100" align="center" fixed="right">
           <template #default="{ row }">
             <el-dropdown
               trigger="click"
               :disabled="row.code === 'ADMIN'"
               @command="(cmd) => onRoleLibCommand(cmd, row)"
             >
-              <el-button type="primary" link size="small" :disabled="row.code === 'ADMIN'">
-                操作 <el-icon class="el-icon--right"><ArrowDown /></el-icon>
-              </el-button>
+              <el-button type="primary" link :disabled="row.code === 'ADMIN'">操作<el-icon class="el-icon--right"><ArrowDown /></el-icon></el-button>
               <template #dropdown>
                 <el-dropdown-menu>
                   <el-dropdown-item command="edit" :disabled="row.code === 'ADMIN'">编辑</el-dropdown-item>
@@ -265,7 +261,7 @@
       <div v-if="isAdmin" class="org-lib-drawer__toolbar">
         <el-button type="primary" size="small" @click="openUserAddForm(); userLibVisible = false">新增用户</el-button>
       </div>
-      <el-table v-loading="userLibLoading" :data="userLibList" stripe max-height="400" class="org-lib-table">
+      <el-table v-loading="userLibLoading" :data="userLibList" stripe max-height="400" class="org-lib-table" border>
         <el-table-column prop="username" label="用户名" min-width="90" />
         <el-table-column prop="realName" label="姓名" min-width="80" />
         <el-table-column label="角色" min-width="120" show-overflow-tooltip>
@@ -274,16 +270,14 @@
         <el-table-column label="状态" min-width="72" align="center">
           <template #default="{ row }">{{ row.status === 1 ? '启用' : '禁用' }}</template>
         </el-table-column>
-        <el-table-column v-if="isAdmin" label="操作" width="90" align="center" fixed="right">
+        <el-table-column v-if="isAdmin" label="操作" width="100" align="center" fixed="right">
           <template #default="{ row }">
             <el-dropdown
               trigger="click"
               :disabled="row.username === 'admin'"
               @command="(cmd) => { if (cmd === 'edit') { openUserEditFormById(row.id); userLibVisible = false } else if (cmd === 'del') handleUserLibDelete(row) }"
             >
-              <el-button type="primary" link size="small" :disabled="row.username === 'admin'">
-                操作 <el-icon class="el-icon--right"><ArrowDown /></el-icon>
-              </el-button>
+              <el-button type="primary" link :disabled="row.username === 'admin'">操作<el-icon class="el-icon--right"><ArrowDown /></el-icon></el-button>
               <template #dropdown>
                 <el-dropdown-menu>
                   <el-dropdown-item command="edit" :disabled="row.username === 'admin'">编辑</el-dropdown-item>

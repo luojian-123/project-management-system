@@ -12,6 +12,10 @@ neo4j:
   password: ${NEO4J_PASSWORD:neo4j123}
 
 # 千人并发：Tomcat 线程与连接调优
+# 交付物文档上传目录（留空则使用 运行目录/uploads）
+# pms:
+#   upload-dir: D:/pms-uploads
+
 server:
   port: 8080
   address: 0.0.0.0

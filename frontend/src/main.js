@@ -8,10 +8,12 @@ import App from './App.vue'
 import router from './router'
 import PageCard from './components/PageCard.vue'
 import DraggableCardList from './components/DraggableCardList.vue'
+import { setupDraggableCards } from './directives/draggableCards.js'
 
 const app = createApp(App)
 app.component('PageCard', PageCard)
 app.component('DraggableCardList', DraggableCardList)
+setupDraggableCards(app)
 const pinia = createPinia()
 app.use(pinia)
 app.use(router)

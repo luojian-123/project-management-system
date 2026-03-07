@@ -1,6 +1,7 @@
 <template>
   <div class="page">
-    <el-card>
+    <div class="page-cards" v-draggable-cards>
+      <el-card>
     <template #header>
       <div class="card-header">
         <div>
@@ -9,7 +10,7 @@
         </div>
       </div>
     </template>
-    <el-table v-loading="loading" :data="list" stripe>
+    <el-table v-loading="loading" :data="list" stripe border>
       <el-table-column label="来源" min-width="84">
         <template #default="{ row }">{{ row._source === 'task' ? '项目任务' : '待办' }}</template>
       </el-table-column>
@@ -103,7 +104,8 @@
         <el-button type="primary" :loading="submitLoading" @click="submitForm">确定</el-button>
       </template>
     </el-dialog>
-    </el-card>
+      </el-card>
+    </div>
   </div>
 </template>
 

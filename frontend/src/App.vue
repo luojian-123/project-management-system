@@ -117,6 +117,12 @@ body {
 .table-actions-cell .el-button {
   flex-shrink: 0;
 }
+/* 操作列下拉按钮：留足右侧空间，避免箭头被裁切 */
+.table-actions-cell .el-dropdown .el-button.is-link {
+  padding-left: 0;
+  padding-right: 8px;
+  min-width: 56px;
+}
 
 /* 抽屉页四边一点点圆角（全局生效，抽屉可能挂载到 body） */
 #app .org-lib-drawer.el-drawer,
@@ -205,11 +211,11 @@ body {
   line-height: var(--leading-normal);
 }
 
-/* ========== 表格（统一表头、斑马纹、边框，表头与列表值字号一致） ========== */
+/* ========== 表格（统一表头、斑马纹，列间竖线隐藏，表头与列表值字号一致） ========== */
 .el-table {
   font-size: var(--text-sm);
   line-height: var(--leading-normal);
-  --el-table-border-color: var(--border-light) !important;
+  --el-table-border-color: transparent !important; /* 列表属性之间的线隐形，列宽仍可拖拽调整 */
   --el-table-header-bg-color: rgba(248,250,252,0.95) !important;
   --el-table-row-hover-bg-color: rgba(0,212,255,0.04) !important;
   --el-table-tr-bg-color: #fff !important;
@@ -224,8 +230,15 @@ body {
 }
 .el-table td.el-table__cell {
   font-size: var(--text-sm);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .el-table .el-table__inner-wrapper::before { display: none; }
+/* 带 border 的表格：列间竖线隐形，列宽拖拽仍可用 */
+.el-table--border .el-table__cell,
+.el-table--border th.el-table__cell,
+.el-table--border td.el-table__cell { border-right-color: transparent !important; }
 .el-table--striped .el-table__body tr.el-table__row--striped td { background: rgba(241,245,249,0.6) !important; }
 .el-table td.el-table__cell, .el-table th.el-table__cell { padding: 12px 16px !important; }
 
@@ -471,6 +484,39 @@ body {
 }
 
 /* ========== 链接与可点击名称 ========== */
+/* 卡片拖拽手柄：在 el-card 头部用 span.card-drag-handle 包裹标题即可上下拖拽排序 */
+.card-drag-handle {
+  cursor: grab;
+  user-select: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.card-drag-handle:active {
+  cursor: grabbing;
+}
+.card-drag-handle::before {
+  content: '';
+  display: inline-block;
+  width: 10px;
+  height: 2px;
+  background: currentColor;
+  box-shadow: 0 3px 0 currentColor, 0 6px 0 currentColor;
+  opacity: 0.5;
+  border-radius: 1px;
+  vertical-align: middle;
+}
+.el-card__header .card-drag-handle {
+  margin-right: 4px;
+}
+/* 卡片拖拽时的占位与拖拽中样式（v-draggable-cards 指令） */
+.card-drag-ghost { opacity: 0.4; }
+.card-drag-drag { opacity: 0.95; box-shadow: var(--shadow-lg); }
+.page-cards .el-card__header,
+.page-cards .plasmic-card__header { cursor: grab; }
+.page-cards .el-card__header:active,
+.page-cards .plasmic-card__header:active { cursor: grabbing; }
+
 .link-name {
   color: var(--primary-start);
   cursor: pointer;

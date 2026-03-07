@@ -5,6 +5,7 @@ import com.pms.common.Result;
 import com.pms.config.WebConfig;
 import com.pms.entity.PmTask;
 import com.pms.entity.PmTaskChange;
+import com.pms.entity.PmTaskDeliverable;
 import com.pms.service.PmTaskService;
 import org.springframework.web.bind.annotation.*;
 
@@ -51,5 +52,57 @@ public class PmTaskController {
     @GetMapping("/{id}/changes")
     public Result<List<PmTaskChange>> getChanges(@PathVariable Long id) {
         return Result.ok(taskService.listChangesByTaskId(id));
+    }
+
+    /** 任务交付物列表 */
+    @GetMapping("/{id}/deliverables")
+    public Result<List<PmTaskDeliverable>> getDeliverables(@PathVariable Long id) {
+        return Result.ok(taskService.listDeliverablesByTaskId(id));
+    }
+
+    /** 新增或更新交付物（无 id 为新增，有 id 为更新） */
+    @PostMapping("/deliverables")
+    public Result<PmTaskDeliverable> saveDeliverable(@RequestBody PmTaskDeliverable d) {
+        taskService.saveDeliverable(d);
+        return Result.ok(d);
+    }
+
+    /** 删除交付物 */
+    @DeleteMapping("/deliverables/{deliverableId}")
+    public Result<Void> deleteDeliverable(@PathVariable Long deliverableId) {
+        taskService.deleteDeliverable(deliverableId);
+        return Result.ok();
+    }
+
+    /** 新增或更新任务（前端 POST /task 或 PUT /task） */
+    @PostMapping
+    public Result<PmTask> save(@RequestBody PmTask task) {
+        taskService.save(task);
+        return Result.ok(task);
+    }
+
+    @PutMapping
+    public Result<PmTask> update(@RequestBody PmTask task) {
+        taskService.save(task);
+        return Result.ok(task);
+    }
+
+    /** 删除任务 */
+    @DeleteMapping("/{id}")
+    public Result<Void> delete(@PathVariable Long id) {
+        taskService.deleteById(id);
+        return Result.ok();
+    }
+
+    /** 任务依赖：获取（前端未配置时返回空列表） */
+    @GetMapping("/{id}/dependencies")
+    public Result<List<Long>> getDependencies(@PathVariable Long id) {
+        return Result.ok(Collections.emptyList());
+    }
+
+    /** 任务依赖：保存（前端未配置时可空实现） */
+    @PostMapping("/{id}/dependencies")
+    public Result<Void> saveDependencies(@PathVariable Long id, @RequestBody List<Long> dependTaskIds) {
+        return Result.ok();
     }
 }

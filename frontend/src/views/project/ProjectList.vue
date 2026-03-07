@@ -1,6 +1,7 @@
 <template>
   <div class="page">
-    <el-card>
+    <div class="page-cards" v-draggable-cards>
+      <el-card>
     <template #header>
       <span>项目管理</span>
       <div style="display:flex; gap:8px; align-items:center">
@@ -14,7 +15,7 @@
         <el-button v-if="isAdmin" type="primary" @click="openForm()">新增项目</el-button>
       </div>
     </template>
-    <el-table v-loading="loading" :data="list" stripe>
+    <el-table v-loading="loading" :data="list" stripe border>
       <el-table-column prop="projectCode" label="项目编号" min-width="100" />
       <el-table-column label="项目名称" min-width="160" show-overflow-tooltip>
         <template #default="{ row }">
@@ -28,7 +29,7 @@
       <el-table-column label="状态" min-width="84">
         <template #default="{ row }">{{ projectStatusMap[row?.status] ?? row?.status ?? '-' }}</template>
       </el-table-column>
-      <el-table-column v-if="isAdmin" label="操作" width="90" fixed="right" align="center">
+      <el-table-column v-if="isAdmin" label="操作" width="100" fixed="right" align="center">
         <template #default="{ row }">
           <div class="table-actions-cell">
             <el-dropdown trigger="click" @command="(cmd) => cmd === 'edit' ? openForm(row) : handleDelete(row)">
@@ -87,7 +88,8 @@
         <el-button type="primary" :loading="submitLoading" @click="submitForm">确定</el-button>
       </template>
     </el-dialog>
-    </el-card>
+      </el-card>
+    </div>
   </div>
 </template>
 

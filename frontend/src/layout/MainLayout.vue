@@ -34,7 +34,35 @@
         <span class="title">{{ pageTitle }}</span>
         <div class="header-right">
           <el-button type="primary" link class="header-ai-btn" @click="onAiAssistantClick">
-            <el-icon><MagicStick /></el-icon>
+            <span class="robot-icon-wrap" title="AI开发助手">
+              <svg class="robot-icon" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <!-- 天线 -->
+                <line class="robot-antenna robot-antenna--l" x1="18" y1="8" x2="16" y2="2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <line class="robot-antenna robot-antenna--r" x1="30" y1="8" x2="32" y2="2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <circle class="robot-antenna-dot" cx="16" cy="2" r="1.5" fill="currentColor"/>
+                <circle class="robot-antenna-dot" cx="32" cy="2" r="1.5" fill="currentColor"/>
+                <!-- 头部 -->
+                <rect class="robot-head" x="10" y="10" width="28" height="22" rx="6" fill="currentColor" opacity="0.12" stroke="currentColor" stroke-width="1.5"/>
+                <!-- 左眼（看着你时会微微移动） -->
+                <g class="robot-eye robot-eye--left">
+                  <ellipse class="robot-eye-open" cx="20" cy="20" rx="4" ry="5" fill="currentColor"/>
+                  <line class="robot-eye-sleep" x1="16" y1="20" x2="24" y2="20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </g>
+                <!-- 右眼 -->
+                <g class="robot-eye robot-eye--right">
+                  <ellipse class="robot-eye-open" cx="28" cy="20" rx="4" ry="5" fill="currentColor"/>
+                  <line class="robot-eye-sleep" x1="24" y1="20" x2="32" y2="20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </g>
+                <!-- 嘴巴/表情 -->
+                <path class="robot-mouth" d="M18 28 Q24 32 30 28" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                <!-- 睡着的 Zzz -->
+                <g class="robot-zzz">
+                  <text x="32" y="14" class="robot-zzz-1" fill="currentColor">z</text>
+                  <text x="36" y="10" class="robot-zzz-2" fill="currentColor">z</text>
+                  <text x="40" y="16" class="robot-zzz-3" fill="currentColor">Z</text>
+                </g>
+              </svg>
+            </span>
             <span>AI开发助手</span>
           </el-button>
           <el-dropdown trigger="click" @command="handleUserCommand" class="user-dropdown">
@@ -75,7 +103,29 @@
     <div class="ai-chat-body">
       <div class="ai-chat-messages">
         <div class="ai-chat-msg ai-chat-msg--assistant">
-          <div class="ai-chat-msg-avatar">杰</div>
+          <div class="ai-chat-msg-avatar">
+            <svg class="robot-icon robot-icon--avatar" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <line class="robot-antenna robot-antenna--l" x1="18" y1="8" x2="16" y2="2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              <line class="robot-antenna robot-antenna--r" x1="30" y1="8" x2="32" y2="2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              <circle class="robot-antenna-dot" cx="16" cy="2" r="1.5" fill="currentColor"/>
+              <circle class="robot-antenna-dot" cx="32" cy="2" r="1.5" fill="currentColor"/>
+              <rect class="robot-head" x="10" y="10" width="28" height="22" rx="6" fill="currentColor" opacity="0.12" stroke="currentColor" stroke-width="1.5"/>
+              <g class="robot-eye robot-eye--left">
+                <ellipse class="robot-eye-open" cx="20" cy="20" rx="4" ry="5" fill="currentColor"/>
+                <line class="robot-eye-sleep" x1="16" y1="20" x2="24" y2="20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </g>
+              <g class="robot-eye robot-eye--right">
+                <ellipse class="robot-eye-open" cx="28" cy="20" rx="4" ry="5" fill="currentColor"/>
+                <line class="robot-eye-sleep" x1="24" y1="20" x2="32" y2="20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </g>
+              <path class="robot-mouth" d="M18 28 Q24 32 30 28" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              <g class="robot-zzz">
+                <text x="32" y="14" class="robot-zzz-1" fill="currentColor">z</text>
+                <text x="36" y="10" class="robot-zzz-2" fill="currentColor">z</text>
+                <text x="40" y="16" class="robot-zzz-3" fill="currentColor">Z</text>
+              </g>
+            </svg>
+          </div>
           <div class="ai-chat-msg-content">
             <div class="ai-chat-msg-name">小杰</div>
             <div class="ai-chat-msg-text">{{ aiGreeting }}</div>
@@ -123,7 +173,7 @@ import { computed, onMounted, ref, reactive } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useUserStore } from '@/store/user'
-import { List, Folder, Money, Warning, Edit, Flag, Setting, User, OfficeBuilding, ArrowDown, MagicStick } from '@element-plus/icons-vue'
+import { List, Folder, Money, Warning, Edit, Flag, Setting, User, OfficeBuilding, ArrowDown } from '@element-plus/icons-vue'
 import { changePassword } from '@/api/auth'
 import ErrorBoundary from '@/components/ErrorBoundary.vue'
 
@@ -364,12 +414,107 @@ function logout() {
 .header-ai-btn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   font-size: var(--text-sm);
   font-weight: var(--font-weight-medium);
   color: var(--primary-start);
 }
 .header-ai-btn:hover { color: var(--tech-purple); }
+
+/* 小机器人图标：拟人化动画 + 悬浮放大三倍 */
+.robot-icon-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+}
+.robot-icon {
+  width: 100%;
+  height: 100%;
+  color: inherit;
+  animation: robot-idle 6s ease-in-out infinite;
+}
+.robot-eye-open {
+  animation: robot-eye-open 6s ease-in-out infinite;
+}
+.robot-eye-sleep {
+  opacity: 0;
+  animation: robot-eye-sleep 6s ease-in-out infinite;
+}
+.robot-eye--left { animation: robot-look-left 6s ease-in-out infinite; }
+.robot-eye--right { animation: robot-look-right 6s ease-in-out infinite; }
+.robot-antenna--l { transform-origin: 18px 8px; animation: robot-antenna-l 2.5s ease-in-out infinite; }
+.robot-antenna--r { transform-origin: 30px 8px; animation: robot-antenna-r 2.5s ease-in-out infinite; }
+.robot-antenna-dot { animation: robot-antenna-dot 2.5s ease-in-out infinite; }
+.robot-mouth {
+  animation: robot-mouth 6s ease-in-out infinite;
+}
+.robot-zzz {
+  pointer-events: none;
+  animation: robot-zzz-show 6s ease-in-out infinite;
+}
+.robot-zzz .robot-zzz-1,
+.robot-zzz .robot-zzz-2,
+.robot-zzz .robot-zzz-3 {
+  font-size: 8px;
+  font-weight: bold;
+  animation: robot-zzz-float 6s ease-in-out infinite;
+}
+.robot-zzz .robot-zzz-2 { animation-delay: 0.15s; }
+.robot-zzz .robot-zzz-3 { animation-delay: 0.3s; }
+
+@keyframes robot-idle {
+  0%, 35%, 100% { transform: scale(1) translateY(0); }
+  40%, 60% { transform: scale(1.02) translateY(-1px); }
+  70%, 85% { transform: scale(1) translateY(0); }
+}
+@keyframes robot-eye-open {
+  0%, 25%, 88%, 100% { opacity: 1; transform: scaleY(1); }
+  26%, 30% { opacity: 0; transform: scaleY(0.1); }
+  31%, 55% { opacity: 1; transform: scaleY(1); }
+  56%, 87% { opacity: 0; transform: scaleY(0.1); }
+}
+@keyframes robot-eye-sleep {
+  0%, 25%, 88%, 100% { opacity: 0; }
+  56%, 87% { opacity: 1; }
+}
+@keyframes robot-look-left {
+  0%, 20%, 90%, 100% { transform: translateX(0); }
+  35%, 50% { transform: translateX(1px); }
+}
+@keyframes robot-look-right {
+  0%, 20%, 90%, 100% { transform: translateX(0); }
+  35%, 50% { transform: translateX(-1px); }
+}
+@keyframes robot-antenna-l {
+  0%, 100% { transform: rotate(-8deg); }
+  50% { transform: rotate(8deg); }
+}
+@keyframes robot-antenna-r {
+  0%, 100% { transform: rotate(8deg); }
+  50% { transform: rotate(-8deg); }
+}
+@keyframes robot-antenna-dot {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+@keyframes robot-mouth {
+  0%, 55%, 100% { opacity: 1; }
+  56%, 87% { opacity: 0.35; }
+}
+@keyframes robot-zzz-show {
+  0%, 52%, 100% { opacity: 0; }
+  56%, 86% { opacity: 1; }
+}
+@keyframes robot-zzz-float {
+  0%, 52%, 100% { opacity: 0; transform: translateY(0); }
+  56% { opacity: 0; transform: translateY(0); }
+  65% { opacity: 0.95; transform: translateY(-2px); }
+  75% { opacity: 0.75; transform: translateY(-4px); }
+  86% { opacity: 0.2; transform: translateY(-5px); }
+}
 .user-dropdown { cursor: pointer; }
 .user-wrap {
   display: flex;
@@ -416,14 +561,22 @@ function logout() {
   flex-shrink: 0;
   width: 36px;
   height: 36px;
+  min-width: 36px;
+  min-height: 36px;
   border-radius: 10px;
-  background: linear-gradient(135deg, var(--tech-cyan), var(--tech-purple));
-  color: #fff;
+  background: transparent;
+  color: var(--primary-start);
   font-size: 0.875rem;
   font-weight: 600;
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: visible;
+}
+.ai-chat-msg-avatar .robot-icon--avatar {
+  width: 100%;
+  height: 100%;
+  color: inherit;
 }
 .ai-chat-msg-name { font-size: 0.75rem; font-weight: 600; color: var(--tech-purple); margin-bottom: 4px; }
 .ai-chat-msg-text { font-size: 0.875rem; line-height: 1.6; color: var(--text-primary); white-space: pre-wrap; word-break: break-word; }

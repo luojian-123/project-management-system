@@ -28,6 +28,7 @@ request.interceptors.request.use(config => {
 
 request.interceptors.response.use(
   res => {
+    if (res.config.responseType === 'blob') return res.data
     const { code, data, message } = res.data
     if (code === 200) return data
     const msg = parseValidationError(res.data) || message || '请求失败'

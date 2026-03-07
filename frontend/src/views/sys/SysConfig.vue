@@ -1,13 +1,14 @@
 <template>
   <div class="page">
-    <el-card>
+    <div class="page-cards" v-draggable-cards>
+      <el-card>
       <template #header>系统配置</template>
       <el-tabs v-model="activeTab">
         <el-tab-pane label="用户管理" name="user">
           <el-input v-model="userKeyword" placeholder="用户名/姓名" clearable style="width:200px;margin-right:8px" />
           <el-button type="primary" size="small" @click="loadUsers">查询</el-button>
           <el-button type="primary" size="small" @click="openUserForm()">新增用户</el-button>
-          <el-table :data="users" v-loading="userLoading" style="margin-top:12px">
+          <el-table :data="users" v-loading="userLoading" style="margin-top:12px" border>
             <el-table-column prop="username" label="用户名" min-width="100" />
             <el-table-column prop="realName" label="姓名" min-width="80" />
             <el-table-column prop="email" label="邮箱" min-width="120" />
@@ -15,12 +16,19 @@
             <el-table-column prop="status" label="状态" min-width="72">
               <template #default="{ row }">{{ row.status === 1 ? '启用' : '禁用' }}</template>
             </el-table-column>
-            <el-table-column label="操作" min-width="180" align="center">
+            <el-table-column label="操作" width="100" align="center" fixed="right">
               <template #default="{ row }">
                 <div class="table-actions-cell">
-                  <el-button link type="primary" @click="openUserForm(row)">编辑</el-button>
-                  <el-button link type="primary" @click="openUserRoles(row)">分配角色</el-button>
-                  <el-button link type="danger" @click="deleteUser(row)" :disabled="row.username === 'admin'">删除</el-button>
+                  <el-dropdown trigger="click" @command="(cmd) => onUserCommand(cmd, row)">
+                    <el-button type="primary" link>操作<el-icon class="el-icon--right"><ArrowDown /></el-icon></el-button>
+                    <template #dropdown>
+                      <el-dropdown-menu>
+                        <el-dropdown-item command="edit">编辑</el-dropdown-item>
+                        <el-dropdown-item command="roles">分配角色</el-dropdown-item>
+                        <el-dropdown-item command="del" divided :disabled="row.username === 'admin'">删除</el-dropdown-item>
+                      </el-dropdown-menu>
+                    </template>
+                  </el-dropdown>
                 </div>
               </template>
             </el-table-column>
@@ -29,18 +37,25 @@
         </el-tab-pane>
         <el-tab-pane label="角色管理" name="role">
           <el-button type="primary" size="small" @click="openRoleForm()">新增角色</el-button>
-          <el-table :data="roles" style="margin-top:12px">
+          <el-table :data="roles" style="margin-top:12px" border>
             <el-table-column prop="code" label="角色编码" min-width="100" />
             <el-table-column prop="name" label="角色名称" min-width="100" />
             <el-table-column prop="status" label="状态" min-width="72">
               <template #default="{ row }">{{ row.status === 1 ? '启用' : '禁用' }}</template>
             </el-table-column>
-            <el-table-column label="操作" min-width="180" align="center">
+            <el-table-column label="操作" width="100" align="center" fixed="right">
               <template #default="{ row }">
                 <div class="table-actions-cell">
-                  <el-button link type="primary" @click="openRoleForm(row)">编辑</el-button>
-                  <el-button link type="primary" @click="openRoleMenus(row)">分配菜单</el-button>
-                  <el-button link type="danger" @click="deleteRole(row)">删除</el-button>
+                  <el-dropdown trigger="click" @command="(cmd) => onRoleCommand(cmd, row)">
+                    <el-button type="primary" link>操作<el-icon class="el-icon--right"><ArrowDown /></el-icon></el-button>
+                    <template #dropdown>
+                      <el-dropdown-menu>
+                        <el-dropdown-item command="edit">编辑</el-dropdown-item>
+                        <el-dropdown-item command="menus">分配菜单</el-dropdown-item>
+                        <el-dropdown-item command="del" divided>删除</el-dropdown-item>
+                      </el-dropdown-menu>
+                    </template>
+                  </el-dropdown>
                 </div>
               </template>
             </el-table-column>
@@ -48,30 +63,44 @@
         </el-tab-pane>
         <el-tab-pane label="字典配置" name="dict">
           <el-button type="primary" size="small" @click="openDictTypeForm()">新增字典类型</el-button>
-          <el-table :data="dictTypes" style="margin-top:12px">
+          <el-table :data="dictTypes" style="margin-top:12px" border>
             <el-table-column prop="code" label="编码" min-width="100" />
             <el-table-column prop="name" label="名称" min-width="100" />
-            <el-table-column label="操作" min-width="180" align="center">
+            <el-table-column label="操作" width="100" align="center" fixed="right">
               <template #default="{ row }">
                 <div class="table-actions-cell">
-                  <el-button link type="primary" @click="openDictTypeForm(row)">编辑</el-button>
-                  <el-button link type="primary" @click="openDictItemList(row)">字典项</el-button>
-                  <el-button link type="danger" @click="deleteDictType(row)">删除</el-button>
+                  <el-dropdown trigger="click" @command="(cmd) => onDictTypeCommand(cmd, row)">
+                    <el-button type="primary" link>操作<el-icon class="el-icon--right"><ArrowDown /></el-icon></el-button>
+                    <template #dropdown>
+                      <el-dropdown-menu>
+                        <el-dropdown-item command="edit">编辑</el-dropdown-item>
+                        <el-dropdown-item command="items">字典项</el-dropdown-item>
+                        <el-dropdown-item command="del" divided>删除</el-dropdown-item>
+                      </el-dropdown-menu>
+                    </template>
+                  </el-dropdown>
                 </div>
               </template>
             </el-table-column>
           </el-table>
           <el-dialog v-model="dictItemDialogVisible" :title="'字典项：' + currentDictType?.name" width="560px">
             <el-button type="primary" size="small" @click="openDictItemForm()">新增项</el-button>
-            <el-table :data="dictItems" style="margin-top:12px">
+            <el-table :data="dictItems" style="margin-top:12px" border>
               <el-table-column prop="itemKey" label="键" min-width="100" />
               <el-table-column prop="itemValue" label="值" min-width="100" />
               <el-table-column prop="sortOrder" label="排序" min-width="64" />
-              <el-table-column label="操作" min-width="100" align="center">
+              <el-table-column label="操作" width="100" align="center">
                 <template #default="{ row }">
                   <div class="table-actions-cell">
-                    <el-button link type="primary" @click="openDictItemForm(row)">编辑</el-button>
-                    <el-button link type="danger" @click="deleteDictItem(row.id)">删除</el-button>
+                    <el-dropdown trigger="click" @command="(cmd) => cmd === 'edit' ? openDictItemForm(row) : deleteDictItem(row.id)">
+                      <el-button type="primary" link>操作<el-icon class="el-icon--right"><ArrowDown /></el-icon></el-button>
+                      <template #dropdown>
+                        <el-dropdown-menu>
+                          <el-dropdown-item command="edit">编辑</el-dropdown-item>
+                          <el-dropdown-item command="del" divided>删除</el-dropdown-item>
+                        </el-dropdown-menu>
+                      </template>
+                    </el-dropdown>
                   </div>
                 </template>
               </el-table-column>
@@ -92,15 +121,22 @@
         <el-tab-pane label="审批流配置" name="approval">
           <el-button type="primary" size="small" @click="openFlowForm()">新增审批流</el-button>
           <el-button type="primary" size="small" @click="loadFlows">刷新</el-button>
-          <el-table :data="flows" style="margin-top:12px">
+          <el-table :data="flows" style="margin-top:12px" border>
             <el-table-column prop="code" label="流程编码" min-width="100" />
             <el-table-column prop="name" label="流程名称" min-width="120" />
             <el-table-column prop="bizType" label="业务类型" min-width="90" />
-            <el-table-column label="操作" min-width="120" align="center">
+            <el-table-column label="操作" width="100" align="center" fixed="right">
               <template #default="{ row }">
                 <div class="table-actions-cell">
-                  <el-button link type="primary" @click="openFlowForm(row)">编辑</el-button>
-                  <el-button link type="danger" @click="deleteFlow(row)">删除</el-button>
+                  <el-dropdown trigger="click" @command="(cmd) => cmd === 'edit' ? openFlowForm(row) : deleteFlow(row)">
+                    <el-button type="primary" link>操作<el-icon class="el-icon--right"><ArrowDown /></el-icon></el-button>
+                    <template #dropdown>
+                      <el-dropdown-menu>
+                        <el-dropdown-item command="edit">编辑</el-dropdown-item>
+                        <el-dropdown-item command="del" divided>删除</el-dropdown-item>
+                      </el-dropdown-menu>
+                    </template>
+                  </el-dropdown>
                 </div>
               </template>
             </el-table-column>
@@ -109,15 +145,22 @@
         <el-tab-pane label="表单配置" name="form">
           <el-button type="primary" size="small" @click="openFormConfigForm()">新增表单</el-button>
           <el-button type="primary" size="small" @click="loadFormConfigs">刷新</el-button>
-          <el-table :data="formConfigs" style="margin-top:12px">
+          <el-table :data="formConfigs" style="margin-top:12px" border>
             <el-table-column prop="formCode" label="表单编码" min-width="100" />
             <el-table-column prop="formName" label="表单名称" min-width="120" />
             <el-table-column prop="bizType" label="业务类型" min-width="90" />
-            <el-table-column label="操作" min-width="120" align="center">
+            <el-table-column label="操作" width="100" align="center" fixed="right">
               <template #default="{ row }">
                 <div class="table-actions-cell">
-                  <el-button link type="primary" @click="openFormConfigForm(row)">编辑</el-button>
-                  <el-button link type="danger" @click="deleteFormConfig(row)">删除</el-button>
+                  <el-dropdown trigger="click" @command="(cmd) => cmd === 'edit' ? openFormConfigForm(row) : deleteFormConfig(row)">
+                    <el-button type="primary" link>操作<el-icon class="el-icon--right"><ArrowDown /></el-icon></el-button>
+                    <template #dropdown>
+                      <el-dropdown-menu>
+                        <el-dropdown-item command="edit">编辑</el-dropdown-item>
+                        <el-dropdown-item command="del" divided>删除</el-dropdown-item>
+                      </el-dropdown-menu>
+                    </template>
+                  </el-dropdown>
                 </div>
               </template>
             </el-table-column>
@@ -140,7 +183,7 @@
         <el-tab-pane label="关联页签配置" name="tab">
           <el-button type="primary" size="small" @click="openTabForm()">新增页签</el-button>
           <el-button type="primary" size="small" @click="loadTabs">刷新</el-button>
-          <el-table :data="tabs" style="margin-top:12px">
+          <el-table :data="tabs" style="margin-top:12px" border>
             <el-table-column prop="bizType" label="业务类型" min-width="90" />
             <el-table-column prop="tabCode" label="页签编码" min-width="100" />
             <el-table-column prop="tabName" label="页签名称" min-width="100" />
@@ -158,6 +201,7 @@
         </el-tab-pane>
       </el-tabs>
     </el-card>
+    </div>
     <el-dialog v-model="userFormVisible" :title="userForm.id ? '编辑用户' : '新增用户'" width="480px">
       <el-form :model="userForm" label-width="80px">
         <el-form-item label="用户名" required>
@@ -232,7 +276,7 @@
         <el-form-item label="业务类型"><el-input v-model="flowForm.bizType" placeholder="如 change" /></el-form-item>
         <el-form-item label="审批节点">
           <div style="margin-bottom:8px"><el-button size="small" @click="addFlowNode">添加节点</el-button></div>
-          <el-table :data="flowNodes" size="small">
+          <el-table :data="flowNodes" size="small" border>
             <el-table-column prop="nodeName" label="节点名称" min-width="120">
               <template #default="{ row, $index }"><el-input v-model="row.nodeName" placeholder="节点名" size="small" /></template>
             </el-table-column>
@@ -270,7 +314,7 @@
         <el-form-item label="保存接口"><el-input v-model="formConfigForm.apiSavePath" placeholder="如 /project，新增/更新基础路径" /></el-form-item>
         <el-form-item label="字段列表">
           <div style="margin-bottom:8px"><el-button size="small" @click="addFormField">添加字段</el-button></div>
-          <el-table :data="formFields" size="small" max-height="280">
+          <el-table :data="formFields" size="small" max-height="280" border>
             <el-table-column prop="fieldName" label="字段名" min-width="90">
               <template #default="{ row }"><el-input v-model="row.fieldName" size="small" placeholder="fieldName" /></template>
             </el-table-column>
@@ -370,6 +414,7 @@ import { roleList, roleGet, roleSave, roleUpdate, roleDelete, roleMenuIds, roleA
 import { menuTree, menuSave, menuDelete } from '@/api/menu'
 import { useUserStore } from '@/store/user'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { ArrowDown } from '@element-plus/icons-vue'
 
 const userStore = useUserStore()
 const activeTab = ref('user')
@@ -445,6 +490,12 @@ function deleteDictType(row) {
   ElMessageBox.confirm('确定删除该字典类型？其下字典项将一并删除。', '提示', { type: 'warning' }).then(() => {
     dictTypeDelete(row.id).then(() => { ElMessage.success('已删除'); loadDictTypes() })
   }).catch(() => {})
+}
+
+function onDictTypeCommand(cmd, row) {
+  if (cmd === 'edit') openDictTypeForm(row)
+  else if (cmd === 'items') openDictItemList(row)
+  else if (cmd === 'del') deleteDictType(row)
 }
 
 async function saveDictType() {
@@ -746,6 +797,12 @@ function deleteUser(row) {
   }).catch(() => {})
 }
 
+function onUserCommand(cmd, row) {
+  if (cmd === 'edit') openUserForm(row)
+  else if (cmd === 'roles') openUserRoles(row)
+  else if (cmd === 'del') deleteUser(row)
+}
+
 async function loadRoles() {
   roles.value = await roleList()
 }
@@ -797,6 +854,12 @@ function deleteRole(row) {
   ElMessageBox.confirm('确定删除该角色？', '提示', { type: 'warning' }).then(() => {
     roleDelete(row.id).then(() => { ElMessage.success('已删除'); loadRoles() })
   }).catch(() => {})
+}
+
+function onRoleCommand(cmd, row) {
+  if (cmd === 'edit') openRoleForm(row)
+  else if (cmd === 'menus') openRoleMenus(row)
+  else if (cmd === 'del') deleteRole(row)
 }
 
 watch(activeTab, (name) => {

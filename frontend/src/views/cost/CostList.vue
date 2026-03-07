@@ -1,11 +1,12 @@
 <template>
   <div class="page">
-    <el-card>
+    <div class="page-cards" v-draggable-cards>
+      <el-card>
     <template #header>
       <span>成本管理</span>
       <el-button v-if="canManageCost" type="primary" @click="openForm()">新增</el-button>
     </template>
-    <el-table v-loading="loading" :data="list" stripe>
+    <el-table v-loading="loading" :data="list" stripe border>
       <el-table-column label="成本类型/备注" min-width="152" show-overflow-tooltip>
         <template #default="{ row }">
           <span class="link-name" @click="openForm(row)">{{ row.costType || row.remark || '-' }}</span>
@@ -16,7 +17,7 @@
       <el-table-column prop="actualAmount" label="实际" min-width="90" />
       <el-table-column prop="occurDate" label="发生日期" min-width="100" />
       <el-table-column prop="remark" label="备注" min-width="120" show-overflow-tooltip />
-      <el-table-column v-if="canManageCost" label="操作" width="90" fixed="right" align="center">
+      <el-table-column v-if="canManageCost" label="操作" width="100" fixed="right" align="center">
         <template #default="{ row }">
           <div class="table-actions-cell">
             <el-dropdown trigger="click" @command="(cmd) => cmd === 'edit' ? openForm(row) : handleDelete(row)">
@@ -68,7 +69,8 @@
         <el-button type="primary" :loading="submitLoading" @click="submitForm">确定</el-button>
       </template>
     </el-dialog>
-    </el-card>
+      </el-card>
+    </div>
   </div>
 </template>
 

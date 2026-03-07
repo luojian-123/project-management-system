@@ -1,6 +1,7 @@
 <template>
   <div class="page">
-    <el-card v-loading="configLoading">
+    <div class="page-cards" v-draggable-cards>
+      <el-card v-loading="configLoading">
       <template v-if="formConfig" #header>
         <span>{{ formConfig.formName }}</span>
         <el-button type="primary" @click="openForm()">新增</el-button>
@@ -9,13 +10,13 @@
         <el-empty description="未找到该对象的表单配置，请在系统配置-表单配置中维护表单编码与接口路径" />
       </template>
       <template v-else-if="formConfig">
-        <el-table :data="list" v-loading="loading">
+        <el-table :data="list" v-loading="loading" border>
           <el-table-column v-for="(col, idx) in listColumns" :key="col.fieldName" :label="col.fieldLabel" :width="col.listWidth || undefined" :min-width="col.listWidth ? undefined : 120" :prop="idx === 0 ? undefined : col.fieldName" show-overflow-tooltip>
             <template v-if="idx === 0" #default="{ row }">
               <span class="link-name" @click="openForm(row)">{{ row[col.fieldName] ?? '-' }}</span>
             </template>
           </el-table-column>
-          <el-table-column label="操作" width="90" fixed="right" align="center">
+          <el-table-column label="操作" width="100" fixed="right" align="center">
             <template #default="{ row }">
               <div class="table-actions-cell">
                 <el-dropdown trigger="click" @command="(cmd) => cmd === 'edit' ? openForm(row) : del(row)">
@@ -42,6 +43,7 @@
         />
       </template>
     </el-card>
+    </div>
     <el-dialog v-if="formConfig" v-model="dialogVisible" :title="formData.id ? '编辑' : '新增'" width="520px">
       <el-form :model="formData" label-width="100px">
         <el-form-item v-for="f in formFields" :key="f.fieldName" :label="f.fieldLabel" :required="f.required === 1">
