@@ -27,14 +27,14 @@
       <artifactId>spring-boot-starter-security</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.mybatis.spring.boot</groupId>
-      <artifactId>mybatis-spring-boot-starter</artifactId>
-      <version>3.0.3</version>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-tx</artifactId>
     </dependency>
+    <!-- 图数据库 Neo4j 驱动（唯一数据源，不再使用 MySQL） -->
     <dependency>
-      <groupId>com.mysql</groupId>
-      <artifactId>mysql-connector-j</artifactId>
-      <scope>runtime</scope>
+      <groupId>org.neo4j.driver</groupId>
+      <artifactId>neo4j-java-driver</artifactId>
+      <version>5.15.0</version>
     </dependency>
     <dependency>
       <groupId>org.projectlombok</groupId>
@@ -59,11 +59,32 @@
       <scope>runtime</scope>
     </dependency>
   </dependencies>
+  <!-- 仅需从 MySQL 做一次性迁移时激活：mvn -Pmigration compile exec:java -Dexec.mainClass=com.pms.migration.MySqlToNeo4jMigration -->
+  <profiles>
+    <profile>
+      <id>migration</id>
+      <dependencies>
+        <dependency>
+          <groupId>com.mysql</groupId>
+          <artifactId>mysql-connector-j</artifactId>
+          <scope>runtime</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+  </profiles>
   <build>
     <plugins>
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>3.1.0</version>
+        <configuration>
+          <mainClass>com.pms.migration.MySqlToNeo4jMigration</mainClass>
+        </configuration>
       </plugin>
     </plugins>
   </build>

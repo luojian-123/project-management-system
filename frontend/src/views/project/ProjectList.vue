@@ -15,17 +15,17 @@
       </div>
     </template>
     <el-table v-loading="loading" :data="list" stripe>
-      <el-table-column prop="projectCode" label="项目编号" width="120" />
-      <el-table-column label="项目名称" min-width="160">
+      <el-table-column prop="projectCode" label="项目编号" min-width="100" />
+      <el-table-column label="项目名称" min-width="160" show-overflow-tooltip>
         <template #default="{ row }">
           <span class="link-name" @click="goDetail(row)">{{ row.projectName || '-' }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="customerName" label="客户" width="120" />
-      <el-table-column prop="ownerName" label="负责人" width="100" />
-      <el-table-column prop="planStart" label="计划开始" width="110" />
-      <el-table-column prop="planEnd" label="计划结束" width="110" />
-      <el-table-column label="状态" width="90">
+      <el-table-column prop="customerName" label="客户" min-width="100" />
+      <el-table-column prop="ownerName" label="负责人" min-width="80" />
+      <el-table-column prop="planStart" label="计划开始" min-width="108" />
+      <el-table-column prop="planEnd" label="计划结束" min-width="108" />
+      <el-table-column label="状态" min-width="84">
         <template #default="{ row }">{{ projectStatusMap[row?.status] ?? row?.status ?? '-' }}</template>
       </el-table-column>
       <el-table-column v-if="isAdmin" label="操作" width="90" fixed="right" align="center">

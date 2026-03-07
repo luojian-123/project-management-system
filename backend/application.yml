@@ -1,26 +1,27 @@
 spring:
   application:
     name: pms-backend
-  datasource:
-    url: jdbc:mysql://localhost:3306/pms?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false
-    username: root
-    password: 12345678
-    driver-class-name: com.mysql.cj.jdbc.Driver
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: Asia/Shanghai
 
-mybatis:
-  mapper-locations: classpath:mapper/**/*.xml
-  type-aliases-package: com.pms.entity
-  configuration:
-    map-underscore-to-camel-case: true
+# 图数据库 Neo4j（替代 MySQL）
+neo4j:
+  uri: bolt://localhost:7687
+  username: neo4j
+  password: ${NEO4J_PASSWORD:neo4j123}
 
+# 千人并发：Tomcat 线程与连接调优
 server:
   port: 8080
   address: 0.0.0.0
   servlet:
     context-path: /api
+  tomcat:
+    threads:
+      max: 400
+    accept-count: 200
+    max-connections: 10000
 
 # JWT
 jwt:

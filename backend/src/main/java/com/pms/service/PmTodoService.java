@@ -2,7 +2,7 @@ package com.pms.service;
 
 import com.pms.common.PageResult;
 import com.pms.entity.PmTodo;
-import com.pms.mapper.PmTodoMapper;
+import com.pms.repository.PmTodoRepository;
 import com.pms.config.WebConfig;
 import org.springframework.stereotype.Service;
 
@@ -11,10 +11,10 @@ import java.util.List;
 @Service
 public class PmTodoService {
 
-    private final PmTodoMapper todoMapper;
+    private final PmTodoRepository todoRepository;
 
-    public PmTodoService(PmTodoMapper todoMapper) {
-        this.todoMapper = todoMapper;
+    public PmTodoService(PmTodoRepository todoRepository) {
+        this.todoRepository = todoRepository;
     }
 
     public PageResult<PmTodo> page(Long userId, int page, int size) {
@@ -22,13 +22,13 @@ public class PmTodoService {
             return new PageResult<>(0L, List.of());
         }
         int offset = (page - 1) * size;
-        List<PmTodo> list = todoMapper.selectPage(userId, offset, size);
-        long total = todoMapper.countPage(userId);
+        List<PmTodo> list = todoRepository.selectPage(userId, offset, size);
+        long total = todoRepository.countPage(userId);
         return new PageResult<>(total, list);
     }
 
     public PmTodo getById(Long id) {
-        return todoMapper.selectById(id);
+        return todoRepository.selectById(id);
     }
 
     public void save(PmTodo todo) {
@@ -36,13 +36,13 @@ public class PmTodoService {
         if (todo.getId() == null) {
             if (todo.getStatus() == null) todo.setStatus("pending");
             if (todo.getPriority() == null) todo.setPriority("medium");
-            todoMapper.insert(todo);
+            todoRepository.insert(todo);
         } else {
-            todoMapper.updateById(todo);
+            todoRepository.updateById(todo);
         }
     }
 
     public void deleteById(Long id) {
-        todoMapper.deleteById(id);
+        todoRepository.deleteById(id);
     }
 }

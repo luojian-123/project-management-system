@@ -34,11 +34,11 @@
       <template #header><span>变更记录</span></template>
       <div>
         <el-table v-loading="changesLoading" :data="changes" stripe>
-          <el-table-column prop="createdAt" label="时间" width="180">
+          <el-table-column prop="createdAt" label="时间" min-width="140">
             <template #default="scope">{{ formatTime(scope.row.createdAt) }}</template>
           </el-table-column>
-          <el-table-column prop="operatorName" label="操作人" width="120" />
-          <el-table-column prop="action" label="操作类型" width="100" />
+          <el-table-column prop="operatorName" label="操作人" min-width="100" />
+          <el-table-column prop="action" label="操作类型" min-width="90" />
           <el-table-column prop="content" label="变更内容" min-width="200" show-overflow-tooltip />
         </el-table>
         <el-empty v-if="!changesLoading && !changes.length" description="暂无变更记录" :image-size="80" />

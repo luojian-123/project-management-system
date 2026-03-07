@@ -25,7 +25,7 @@
 ### 后端
 
 - Spring Boot
-- MyBatis
+- **Neo4j 图数据库**（替代 MySQL + MyBatis，支撑约 1000 人并发）
 - JWT / Spring Security
 
 ### 脚本与运行环境
@@ -51,7 +51,34 @@
 - npm 9+
 - Java 17+
 - Maven 3.8+
+- **Neo4j 5.x**（图数据库，后端唯一数据源）
 - Windows PowerShell
+
+## 后端启动前：Neo4j
+
+后端已切换为 **Neo4j 图数据库**，不再使用 MySQL。启动后端前请：
+
+1. **安装并启动 Neo4j 5.x**（安装地址：**D:\图数据库**）
+   - 推荐：在 `重启` 目录执行 `.\install-neo4j.ps1`，将自动下载并解压到 `D:\图数据库`，之后可用 `.\start-neo4j.ps1` 启动。
+   - 详细步骤见 **`重启/Neo4j安装与启动说明.md`**。
+   - 默认 Bolt 端口 `7687`。
+2. **确认 `backend/application.yml`** 中 Neo4j 与实例一致：
+   - `neo4j.uri`: `bolt://localhost:7687`
+   - `neo4j.username`: `neo4j`
+   - `neo4j.password`: 默认 `neo4j123`（或通过环境变量 `NEO4J_PASSWORD` 覆盖）。
+3. **启动后端**：首次启动会自动建约束并初始化管理员账号（**admin / 123456**）、ADMIN 角色及默认菜单；**前端无需改代码**，照常访问。
+
+千人并发架构与配置说明见：**`docs/图数据库与千人并发方案.md`**。
+
+### 从 MySQL 迁移数据到 Neo4j
+
+若曾有数据在 MySQL（pms 库）中并需迁到 Neo4j，可做**一次性迁移**：先启动 MySQL 与 Neo4j，在 `backend` 目录执行（使用 `-Pmigration` 才会引入 MySQL 驱动）：
+
+```bash
+mvn -Pmigration compile exec:java -Dexec.mainClass="com.pms.migration.MySqlToNeo4jMigration"
+```
+
+日常运行与构建**不需要 MySQL**，仅需 Neo4j。连接信息可通过环境变量覆盖，详见 **`docs/数据迁移-MySQL到Neo4j.md`**。
 
 ## 本地启动方式
 

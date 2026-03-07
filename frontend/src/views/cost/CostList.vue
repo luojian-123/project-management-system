@@ -6,15 +6,15 @@
       <el-button v-if="canManageCost" type="primary" @click="openForm()">新增</el-button>
     </template>
     <el-table v-loading="loading" :data="list" stripe>
-      <el-table-column label="成本类型/备注" min-width="140">
+      <el-table-column label="成本类型/备注" min-width="152" show-overflow-tooltip>
         <template #default="{ row }">
           <span class="link-name" @click="openForm(row)">{{ row.costType || row.remark || '-' }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="projectId" label="项目ID" width="90" />
-      <el-table-column prop="budgetAmount" label="预算" width="100" />
-      <el-table-column prop="actualAmount" label="实际" width="100" />
-      <el-table-column prop="occurDate" label="发生日期" width="120" />
+      <el-table-column prop="projectId" label="项目ID" min-width="80" />
+      <el-table-column prop="budgetAmount" label="预算" min-width="90" />
+      <el-table-column prop="actualAmount" label="实际" min-width="90" />
+      <el-table-column prop="occurDate" label="发生日期" min-width="100" />
       <el-table-column prop="remark" label="备注" min-width="120" show-overflow-tooltip />
       <el-table-column v-if="canManageCost" label="操作" width="90" fixed="right" align="center">
         <template #default="{ row }">

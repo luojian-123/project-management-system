@@ -81,9 +81,10 @@ defineProps({
   flex-wrap: wrap;
   gap: var(--gap-inline);
   padding: var(--space-header);
-  font-weight: 600;
-  font-size: 0.9375rem;
-  letter-spacing: -0.011em;
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--text-md);
+  line-height: var(--leading-normal);
+  letter-spacing: var(--tracking-tight);
   color: var(--text-primary);
   border-bottom: 1px solid var(--border-light);
   background: var(--bg-header);
@@ -135,8 +136,9 @@ defineProps({
 }
 .plasmic-card__body {
   padding: var(--space-card);
-  font-size: 0.875rem;
-  letter-spacing: -0.011em;
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  letter-spacing: var(--tracking-tight);
   color: var(--text-primary);
 }
 </style>

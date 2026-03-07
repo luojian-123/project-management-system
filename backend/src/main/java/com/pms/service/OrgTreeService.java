@@ -5,7 +5,7 @@ import com.pms.entity.PmCompany;
 import com.pms.entity.PmDept;
 import com.pms.entity.SysRole;
 import com.pms.entity.SysUser;
-import com.pms.mapper.*;
+import com.pms.repository.*;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -14,38 +14,42 @@ import java.util.List;
 @Service
 public class OrgTreeService {
 
-    private final PmCompanyMapper companyMapper;
-    private final PmDeptMapper deptMapper;
-    private final SysRoleMapper roleMapper;
-    private final SysUserMapper userMapper;
-    private final SysUserRoleMapper userRoleMapper;
+    private final PmCompanyRepository companyRepository;
+    private final PmDeptRepository deptRepository;
+    private final SysRoleRepository roleRepository;
+    private final SysUserRepository userRepository;
+    private final SysUserRoleRepository userRoleRepository;
+    private final OrgBootstrapService orgBootstrapService;
 
-    public OrgTreeService(PmCompanyMapper companyMapper,
-                          PmDeptMapper deptMapper,
-                          SysRoleMapper roleMapper,
-                          SysUserMapper userMapper,
-                          SysUserRoleMapper userRoleMapper) {
-        this.companyMapper = companyMapper;
-        this.deptMapper = deptMapper;
-        this.roleMapper = roleMapper;
-        this.userMapper = userMapper;
-        this.userRoleMapper = userRoleMapper;
+    public OrgTreeService(PmCompanyRepository companyRepository,
+                          PmDeptRepository deptRepository,
+                          SysRoleRepository roleRepository,
+                          SysUserRepository userRepository,
+                          SysUserRoleRepository userRoleRepository,
+                          OrgBootstrapService orgBootstrapService) {
+        this.companyRepository = companyRepository;
+        this.deptRepository = deptRepository;
+        this.roleRepository = roleRepository;
+        this.userRepository = userRepository;
+        this.userRoleRepository = userRoleRepository;
+        this.orgBootstrapService = orgBootstrapService;
     }
 
     public List<OrgTreeNode> buildTree() {
-        List<PmCompany> companies = companyMapper.selectList();
+        orgBootstrapService.ensureSystemCompanyExists();
+        List<PmCompany> companies = companyRepository.selectList();
         List<OrgTreeNode> roots = new ArrayList<>();
         for (PmCompany c : companies) {
             OrgTreeNode companyNode = new OrgTreeNode("company", c.getId(), firstNonBlank(c.getCompanyName(), c.getCompanyCode(), "公司"));
-            List<PmDept> depts = deptMapper.selectByCompanyId(c.getId());
+            List<PmDept> depts = deptRepository.selectByCompanyId(c.getId());
             for (PmDept d : depts) {
                 OrgTreeNode deptNode = new OrgTreeNode("dept", d.getId(), firstNonBlank(d.getDeptName(), d.getDeptCode(), "部门"));
-                List<SysRole> roles = roleMapper.selectByDeptId(d.getId());
+                List<SysRole> roles = roleRepository.selectByDeptId(d.getId());
                 for (SysRole r : roles) {
                     OrgTreeNode roleNode = new OrgTreeNode("role", r.getId(), firstNonBlank(r.getName(), r.getCode(), "角色"));
-                    List<Long> userIds = userRoleMapper.selectUserIdsByRoleId(r.getId());
+                    List<Long> userIds = userRoleRepository.selectUserIdsByRoleId(r.getId());
                     for (Long uid : userIds) {
-                        SysUser u = userMapper.selectById(uid);
+                        SysUser u = userRepository.selectById(uid);
                         if (u != null) {
                             roleNode.getChildren().add(new OrgTreeNode("user", u.getId(), firstNonBlank(u.getRealName(), u.getUsername(), "用户")));
                         }

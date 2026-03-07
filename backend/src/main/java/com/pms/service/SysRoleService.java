@@ -1,59 +1,52 @@
 package com.pms.service;
 
+import com.pms.entity.PmDept;
 import com.pms.entity.SysRole;
-import com.pms.mapper.SysRoleMapper;
-import com.pms.mapper.SysRoleDeptMapper;
-import com.pms.mapper.SysRoleMenuMapper;
-import com.pms.mapper.SysUserRoleMapper;
+import com.pms.repository.PmCompanyRepository;
+import com.pms.repository.PmDeptRepository;
+import com.pms.repository.SysRoleRepository;
+import com.pms.repository.SysRoleDeptRepository;
+import com.pms.repository.SysRoleMenuRepository;
+import com.pms.repository.SysUserRoleRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class SysRoleService {
 
-    private final SysRoleMapper roleMapper;
-    private final SysRoleDeptMapper roleDeptMapper;
-    private final SysRoleMenuMapper roleMenuMapper;
-    private final SysUserRoleMapper userRoleMapper;
+    private final SysRoleRepository roleRepository;
+    private final SysRoleDeptRepository roleDeptRepository;
+    private final SysRoleMenuRepository roleMenuRepository;
+    private final SysUserRoleRepository userRoleRepository;
+    private final PmCompanyRepository companyRepository;
+    private final PmDeptRepository deptRepository;
 
-    public SysRoleService(SysRoleMapper roleMapper, SysRoleDeptMapper roleDeptMapper,
-                          SysRoleMenuMapper roleMenuMapper, SysUserRoleMapper userRoleMapper) {
-        this.roleMapper = roleMapper;
-        this.roleDeptMapper = roleDeptMapper;
-        this.roleMenuMapper = roleMenuMapper;
-        this.userRoleMapper = userRoleMapper;
+    public SysRoleService(SysRoleRepository roleRepository, SysRoleDeptRepository roleDeptRepository,
+                          SysRoleMenuRepository roleMenuRepository, SysUserRoleRepository userRoleRepository,
+                          PmCompanyRepository companyRepository, PmDeptRepository deptRepository) {
+        this.roleRepository = roleRepository;
+        this.roleDeptRepository = roleDeptRepository;
+        this.roleMenuRepository = roleMenuRepository;
+        this.userRoleRepository = userRoleRepository;
+        this.companyRepository = companyRepository;
+        this.deptRepository = deptRepository;
     }
 
     public List<SysRole> list() {
-        List<SysRole> roles = roleMapper.selectList();
-        for (SysRole r : roles) {
-            if (r.getId() != null)
-                r.setDeptIds(roleDeptMapper.selectDeptIdsByRoleId(r.getId()));
-        }
-        return roles;
+        return roleRepository.selectList();
     }
 
     public List<SysRole> listByDeptId(Long deptId) {
-        List<Long> roleIds = roleDeptMapper.selectRoleIdsByDeptId(deptId);
-        List<SysRole> result = new ArrayList<>();
-        for (Long rid : roleIds) {
-            SysRole r = roleMapper.selectById(rid);
-            if (r != null) {
-                r.setDeptIds(roleDeptMapper.selectDeptIdsByRoleId(rid));
-                result.add(r);
-            }
-        }
-        return result;
+        return roleRepository.selectByDeptId(deptId);
     }
 
     public SysRole getById(Long id) {
-        SysRole role = roleMapper.selectById(id);
-        if (role != null && id != null)
-            role.setDeptIds(roleDeptMapper.selectDeptIdsByRoleId(id));
-        return role;
+        return roleRepository.selectById(id);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -62,37 +55,45 @@ public class SysRoleService {
         if (role.getSortOrder() == null) role.setSortOrder(0);
         if (role.getDeptIds() != null && !role.getDeptIds().isEmpty())
             role.setDeptId(role.getDeptIds().get(0));
-        if (role.getId() == null) roleMapper.insert(role);
-        else roleMapper.updateById(role);
+        if (role.getId() == null) roleRepository.insert(role);
+        else roleRepository.updateById(role);
         if (role.getId() != null) {
-            roleDeptMapper.deleteByRoleId(role.getId());
-            if (role.getDeptIds() != null) {
-                for (Long deptId : role.getDeptIds()) {
-                    if (deptId != null)
-                        roleDeptMapper.insert(role.getId(), deptId);
+            roleDeptRepository.deleteByRoleId(role.getId());
+            Set<Long> deptIds = new LinkedHashSet<>(role.getDeptIds() != null ? role.getDeptIds() : List.of());
+            if ("ADMIN".equals(role.getCode())) {
+                var sysCompany = companyRepository.selectByCode(PmCompanyRepository.SYS_COMPANY_CODE);
+                if (sysCompany != null && sysCompany.getId() != null) {
+                    PmDept sysDept = deptRepository.selectByCompanyIdAndCode(sysCompany.getId(), PmDeptRepository.SYS_DEPT_CODE);
+                    if (sysDept != null && sysDept.getId() != null) {
+                        deptIds.add(sysDept.getId());
+                    }
                 }
+            }
+            for (Long deptId : deptIds) {
+                if (deptId != null)
+                    roleDeptRepository.insert(role.getId(), deptId);
             }
         }
     }
 
     @Transactional(rollbackFor = Exception.class)
     public void deleteById(Long id) {
-        roleMenuMapper.deleteByRoleId(id);
-        roleDeptMapper.deleteByRoleId(id);
-        userRoleMapper.deleteByRoleId(id);
-        roleMapper.deleteById(id);
+        roleMenuRepository.deleteByRoleId(id);
+        roleDeptRepository.deleteByRoleId(id);
+        userRoleRepository.deleteByRoleId(id);
+        roleRepository.deleteById(id);
     }
 
     public List<Long> getMenuIdsByRoleId(Long roleId) {
-        return roleMenuMapper.selectMenuIdsByRoleId(roleId);
+        return roleMenuRepository.selectMenuIdsByRoleId(roleId);
     }
 
     @Transactional(rollbackFor = Exception.class)
     public void setMenus(Long roleId, List<Long> menuIds) {
-        roleMenuMapper.deleteByRoleId(roleId);
+        roleMenuRepository.deleteByRoleId(roleId);
         if (menuIds != null) {
             for (Long mid : menuIds) {
-                roleMenuMapper.insert(roleId, mid);
+                roleMenuRepository.insert(roleId, mid);
             }
         }
     }

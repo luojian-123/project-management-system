@@ -10,7 +10,7 @@
       </template>
       <template v-else-if="formConfig">
         <el-table :data="list" v-loading="loading">
-          <el-table-column v-for="(col, idx) in listColumns" :key="col.fieldName" :label="col.fieldLabel" :width="col.listWidth || undefined" :min-width="col.listWidth ? undefined : 120" :prop="idx === 0 ? undefined : col.fieldName">
+          <el-table-column v-for="(col, idx) in listColumns" :key="col.fieldName" :label="col.fieldLabel" :width="col.listWidth || undefined" :min-width="col.listWidth ? undefined : 120" :prop="idx === 0 ? undefined : col.fieldName" show-overflow-tooltip>
             <template v-if="idx === 0" #default="{ row }">
               <span class="link-name" @click="openForm(row)">{{ row[col.fieldName] ?? '-' }}</span>
             </template>

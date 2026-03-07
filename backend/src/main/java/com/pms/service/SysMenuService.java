@@ -1,8 +1,8 @@
 package com.pms.service;
 
 import com.pms.entity.SysMenu;
-import com.pms.mapper.SysMenuMapper;
-import com.pms.mapper.SysRoleMenuMapper;
+import com.pms.repository.SysMenuRepository;
+import com.pms.repository.SysRoleMenuRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,16 +12,16 @@ import java.util.List;
 @Service
 public class SysMenuService {
 
-    private final SysMenuMapper menuMapper;
-    private final SysRoleMenuMapper roleMenuMapper;
+    private final SysMenuRepository menuRepository;
+    private final SysRoleMenuRepository roleMenuRepository;
 
-    public SysMenuService(SysMenuMapper menuMapper, SysRoleMenuMapper roleMenuMapper) {
-        this.menuMapper = menuMapper;
-        this.roleMenuMapper = roleMenuMapper;
+    public SysMenuService(SysMenuRepository menuRepository, SysRoleMenuRepository roleMenuRepository) {
+        this.menuRepository = menuRepository;
+        this.roleMenuRepository = roleMenuRepository;
     }
 
     public List<SysMenu> tree() {
-        List<SysMenu> all = menuMapper.selectAll();
+        List<SysMenu> all = menuRepository.selectAll();
         return buildTree(all, 0L);
     }
 
@@ -38,7 +38,7 @@ public class SysMenuService {
     }
 
     public SysMenu getById(Long id) {
-        return menuMapper.selectById(id);
+        return menuRepository.selectById(id);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -46,14 +46,14 @@ public class SysMenuService {
         if (menu.getStatus() == null) menu.setStatus(1);
         if (menu.getSortOrder() == null) menu.setSortOrder(0);
         if (menu.getParentId() == null) menu.setParentId(0L);
-        if (menu.getId() == null) menuMapper.insert(menu);
-        else menuMapper.updateById(menu);
+        if (menu.getId() == null) menuRepository.insert(menu);
+        else menuRepository.updateById(menu);
     }
 
     @Transactional(rollbackFor = Exception.class)
     public void deleteById(Long id) {
-        roleMenuMapper.deleteByMenuId(id);
-        menuMapper.deleteById(id);
+        roleMenuRepository.deleteByMenuId(id);
+        menuRepository.deleteById(id);
     }
 }
 

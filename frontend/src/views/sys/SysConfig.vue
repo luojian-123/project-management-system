@@ -8,14 +8,14 @@
           <el-button type="primary" size="small" @click="loadUsers">查询</el-button>
           <el-button type="primary" size="small" @click="openUserForm()">新增用户</el-button>
           <el-table :data="users" v-loading="userLoading" style="margin-top:12px">
-            <el-table-column prop="username" label="用户名" width="120" />
-            <el-table-column prop="realName" label="姓名" width="100" />
-            <el-table-column prop="email" label="邮箱" />
-            <el-table-column prop="phone" label="手机" width="120" />
-            <el-table-column prop="status" label="状态" width="80">
+            <el-table-column prop="username" label="用户名" min-width="100" />
+            <el-table-column prop="realName" label="姓名" min-width="80" />
+            <el-table-column prop="email" label="邮箱" min-width="120" />
+            <el-table-column prop="phone" label="手机" min-width="110" />
+            <el-table-column prop="status" label="状态" min-width="72">
               <template #default="{ row }">{{ row.status === 1 ? '启用' : '禁用' }}</template>
             </el-table-column>
-            <el-table-column label="操作" width="200" align="center">
+            <el-table-column label="操作" min-width="180" align="center">
               <template #default="{ row }">
                 <div class="table-actions-cell">
                   <el-button link type="primary" @click="openUserForm(row)">编辑</el-button>
@@ -30,12 +30,12 @@
         <el-tab-pane label="角色管理" name="role">
           <el-button type="primary" size="small" @click="openRoleForm()">新增角色</el-button>
           <el-table :data="roles" style="margin-top:12px">
-            <el-table-column prop="code" label="角色编码" width="120" />
-            <el-table-column prop="name" label="角色名称" />
-            <el-table-column prop="status" label="状态" width="80">
+            <el-table-column prop="code" label="角色编码" min-width="100" />
+            <el-table-column prop="name" label="角色名称" min-width="100" />
+            <el-table-column prop="status" label="状态" min-width="72">
               <template #default="{ row }">{{ row.status === 1 ? '启用' : '禁用' }}</template>
             </el-table-column>
-            <el-table-column label="操作" width="200" align="center">
+            <el-table-column label="操作" min-width="180" align="center">
               <template #default="{ row }">
                 <div class="table-actions-cell">
                   <el-button link type="primary" @click="openRoleForm(row)">编辑</el-button>
@@ -49,9 +49,9 @@
         <el-tab-pane label="字典配置" name="dict">
           <el-button type="primary" size="small" @click="openDictTypeForm()">新增字典类型</el-button>
           <el-table :data="dictTypes" style="margin-top:12px">
-            <el-table-column prop="code" label="编码" width="120" />
-            <el-table-column prop="name" label="名称" />
-            <el-table-column label="操作" width="200" align="center">
+            <el-table-column prop="code" label="编码" min-width="100" />
+            <el-table-column prop="name" label="名称" min-width="100" />
+            <el-table-column label="操作" min-width="180" align="center">
               <template #default="{ row }">
                 <div class="table-actions-cell">
                   <el-button link type="primary" @click="openDictTypeForm(row)">编辑</el-button>
@@ -64,10 +64,10 @@
           <el-dialog v-model="dictItemDialogVisible" :title="'字典项：' + currentDictType?.name" width="560px">
             <el-button type="primary" size="small" @click="openDictItemForm()">新增项</el-button>
             <el-table :data="dictItems" style="margin-top:12px">
-              <el-table-column prop="itemKey" label="键" width="120" />
-              <el-table-column prop="itemValue" label="值" />
-              <el-table-column prop="sortOrder" label="排序" width="80" />
-              <el-table-column label="操作" width="120" align="center">
+              <el-table-column prop="itemKey" label="键" min-width="100" />
+              <el-table-column prop="itemValue" label="值" min-width="100" />
+              <el-table-column prop="sortOrder" label="排序" min-width="64" />
+              <el-table-column label="操作" min-width="100" align="center">
                 <template #default="{ row }">
                   <div class="table-actions-cell">
                     <el-button link type="primary" @click="openDictItemForm(row)">编辑</el-button>
@@ -93,10 +93,10 @@
           <el-button type="primary" size="small" @click="openFlowForm()">新增审批流</el-button>
           <el-button type="primary" size="small" @click="loadFlows">刷新</el-button>
           <el-table :data="flows" style="margin-top:12px">
-            <el-table-column prop="code" label="流程编码" width="120" />
-            <el-table-column prop="name" label="流程名称" />
-            <el-table-column prop="bizType" label="业务类型" width="100" />
-            <el-table-column label="操作" width="130" align="center">
+            <el-table-column prop="code" label="流程编码" min-width="100" />
+            <el-table-column prop="name" label="流程名称" min-width="120" />
+            <el-table-column prop="bizType" label="业务类型" min-width="90" />
+            <el-table-column label="操作" min-width="120" align="center">
               <template #default="{ row }">
                 <div class="table-actions-cell">
                   <el-button link type="primary" @click="openFlowForm(row)">编辑</el-button>
@@ -110,10 +110,10 @@
           <el-button type="primary" size="small" @click="openFormConfigForm()">新增表单</el-button>
           <el-button type="primary" size="small" @click="loadFormConfigs">刷新</el-button>
           <el-table :data="formConfigs" style="margin-top:12px">
-            <el-table-column prop="formCode" label="表单编码" width="120" />
-            <el-table-column prop="formName" label="表单名称" />
-            <el-table-column prop="bizType" label="业务类型" width="100" />
-            <el-table-column label="操作" width="130" align="center">
+            <el-table-column prop="formCode" label="表单编码" min-width="100" />
+            <el-table-column prop="formName" label="表单名称" min-width="120" />
+            <el-table-column prop="bizType" label="业务类型" min-width="90" />
+            <el-table-column label="操作" min-width="120" align="center">
               <template #default="{ row }">
                 <div class="table-actions-cell">
                   <el-button link type="primary" @click="openFormConfigForm(row)">编辑</el-button>
@@ -141,12 +141,12 @@
           <el-button type="primary" size="small" @click="openTabForm()">新增页签</el-button>
           <el-button type="primary" size="small" @click="loadTabs">刷新</el-button>
           <el-table :data="tabs" style="margin-top:12px">
-            <el-table-column prop="bizType" label="业务类型" width="100" />
-            <el-table-column prop="tabCode" label="页签编码" width="120" />
-            <el-table-column prop="tabName" label="页签名称" />
-            <el-table-column prop="tabPath" label="路径" />
-            <el-table-column prop="sortOrder" label="排序" width="80" />
-            <el-table-column label="操作" width="130" align="center">
+            <el-table-column prop="bizType" label="业务类型" min-width="90" />
+            <el-table-column prop="tabCode" label="页签编码" min-width="100" />
+            <el-table-column prop="tabName" label="页签名称" min-width="100" />
+            <el-table-column prop="tabPath" label="路径" min-width="120" />
+            <el-table-column prop="sortOrder" label="排序" min-width="64" />
+            <el-table-column label="操作" min-width="120" align="center">
               <template #default="{ row }">
                 <div class="table-actions-cell">
                   <el-button link type="primary" @click="openTabForm(row)">编辑</el-button>
@@ -233,10 +233,10 @@
         <el-form-item label="审批节点">
           <div style="margin-bottom:8px"><el-button size="small" @click="addFlowNode">添加节点</el-button></div>
           <el-table :data="flowNodes" size="small">
-            <el-table-column prop="nodeName" label="节点名称" width="140">
+            <el-table-column prop="nodeName" label="节点名称" min-width="120">
               <template #default="{ row, $index }"><el-input v-model="row.nodeName" placeholder="节点名" size="small" /></template>
             </el-table-column>
-            <el-table-column prop="approverType" label="审批人类型" width="120">
+            <el-table-column prop="approverType" label="审批人类型" min-width="108">
               <template #default="{ row }">
                 <el-select v-model="row.approverType" placeholder="类型" size="small" style="width:100%">
                   <el-option label="角色" value="ROLE" /><el-option label="用户" value="USER" />
@@ -246,7 +246,7 @@
             <el-table-column prop="approverId" label="审批人ID">
               <template #default="{ row }"><el-input v-model="row.approverId" placeholder="角色ID或用户ID" size="small" /></template>
             </el-table-column>
-            <el-table-column label="操作" width="80" align="center">
+            <el-table-column label="操作" min-width="72" align="center">
               <template #default="{ $index }">
                 <div class="table-actions-cell">
                   <el-button link type="danger" size="small" @click="flowNodes.splice($index, 1)">删除</el-button>
@@ -271,35 +271,35 @@
         <el-form-item label="字段列表">
           <div style="margin-bottom:8px"><el-button size="small" @click="addFormField">添加字段</el-button></div>
           <el-table :data="formFields" size="small" max-height="280">
-            <el-table-column prop="fieldName" label="字段名" width="100">
+            <el-table-column prop="fieldName" label="字段名" min-width="90">
               <template #default="{ row }"><el-input v-model="row.fieldName" size="small" placeholder="fieldName" /></template>
             </el-table-column>
-            <el-table-column prop="fieldLabel" label="标签" width="80">
+            <el-table-column prop="fieldLabel" label="标签" min-width="70">
               <template #default="{ row }"><el-input v-model="row.fieldLabel" size="small" placeholder="标签" /></template>
             </el-table-column>
-            <el-table-column prop="fieldType" label="类型" width="88">
+            <el-table-column prop="fieldType" label="类型" min-width="80">
               <template #default="{ row }">
                 <el-select v-model="row.fieldType" size="small" style="width:100%">
                   <el-option label="文本" value="text" /><el-option label="数字" value="number" /><el-option label="日期" value="date" /><el-option label="下拉" value="select" />
                 </el-select>
               </template>
             </el-table-column>
-            <el-table-column prop="required" label="必填" width="56">
+            <el-table-column prop="required" label="必填" min-width="56">
               <template #default="{ row }"><el-checkbox v-model="row.required" :true-value="1" :false-value="0" /></template>
             </el-table-column>
-            <el-table-column prop="sortOrder" label="排序" width="56">
+            <el-table-column prop="sortOrder" label="排序" min-width="56">
               <template #default="{ row }"><el-input-number v-model="row.sortOrder" :min="0" size="small" controls-position="right" /></template>
             </el-table-column>
-            <el-table-column prop="showInList" label="列表" width="56">
+            <el-table-column prop="showInList" label="列表" min-width="56">
               <template #default="{ row }"><el-checkbox v-model="row.showInList" :true-value="1" :false-value="0" /></template>
             </el-table-column>
-            <el-table-column prop="listOrder" label="列序" width="56">
+            <el-table-column prop="listOrder" label="列序" min-width="56">
               <template #default="{ row }"><el-input-number v-model="row.listOrder" :min="0" size="small" controls-position="right" /></template>
             </el-table-column>
-            <el-table-column prop="listWidth" label="列宽" width="70">
+            <el-table-column prop="listWidth" label="列宽" min-width="64">
               <template #default="{ row }"><el-input v-model="row.listWidth" size="small" placeholder="120" /></template>
             </el-table-column>
-            <el-table-column label="操作" width="64" align="center">
+            <el-table-column label="操作" min-width="64" align="center">
               <template #default="{ $index }">
                 <div class="table-actions-cell">
                   <el-button link type="danger" size="small" @click="formFields.splice($index, 1)">删</el-button>

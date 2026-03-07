@@ -20,21 +20,21 @@
         <el-button type="primary" size="small" @click="openTaskForm()">新增任务</el-button>
       </template>
       <el-table :data="taskList" v-loading="taskLoading" row-key="id" default-expand-all>
-        <el-table-column prop="taskCode" label="任务编码" width="100" />
-        <el-table-column label="任务名称" min-width="200">
+        <el-table-column prop="taskCode" label="任务编码" min-width="90" />
+        <el-table-column label="任务名称" min-width="200" show-overflow-tooltip>
           <template #default="{ row }">
             <router-link :to="`/task/${row.id}`" class="task-name-link">{{ row.taskName }}</router-link>
           </template>
         </el-table-column>
-        <el-table-column prop="assigneeName" label="负责人" width="100" />
-        <el-table-column prop="planStart" label="计划开始" width="110" />
-        <el-table-column prop="planEnd" label="计划结束" width="110" />
-        <el-table-column prop="actualStart" label="实际开始" width="110" />
-        <el-table-column prop="actualEnd" label="实际结束" width="110" />
-        <el-table-column prop="progress" label="进度" width="80">
+        <el-table-column prop="assigneeName" label="负责人" min-width="80" />
+        <el-table-column prop="planStart" label="计划开始" min-width="108" />
+        <el-table-column prop="planEnd" label="计划结束" min-width="108" />
+        <el-table-column prop="actualStart" label="实际开始" min-width="108" />
+        <el-table-column prop="actualEnd" label="实际结束" min-width="108" />
+        <el-table-column prop="progress" label="进度" min-width="72">
           <template #default="{ row }">{{ row.progress }}%</template>
         </el-table-column>
-        <el-table-column prop="status" label="状态" width="90">
+        <el-table-column prop="status" label="状态" min-width="80">
           <template #default="{ row }">{{ taskStatusMap[row.status] || row.status }}</template>
         </el-table-column>
         <el-table-column label="操作" width="130" fixed="right">

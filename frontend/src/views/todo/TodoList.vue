@@ -10,29 +10,29 @@
       </div>
     </template>
     <el-table v-loading="loading" :data="list" stripe>
-      <el-table-column label="来源" width="90">
+      <el-table-column label="来源" min-width="84">
         <template #default="{ row }">{{ row._source === 'task' ? '项目任务' : '待办' }}</template>
       </el-table-column>
-      <el-table-column label="任务名称" min-width="180">
+      <el-table-column label="任务名称" min-width="180" show-overflow-tooltip>
         <template #default="{ row }">
           <span v-if="row._source === 'todo'" class="link-name" @click="openForm(row)">{{ row.title || '-' }}</span>
           <router-link v-else-if="row.id" :to="`/task/${row.id}`" class="link-name">{{ row.taskName || '-' }}</router-link>
           <span v-else>{{ row.taskName || '-' }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="项目" width="120">
+      <el-table-column label="项目" min-width="100">
         <template #default="{ row }">{{ row._source === 'task' ? (row.projectName || '-') : '-' }}</template>
       </el-table-column>
-      <el-table-column label="任务类型" width="100">
+      <el-table-column label="任务类型" min-width="100">
         <template #default="{ row }">{{ row._source === 'todo' ? (taskTypeMap[row.bizType] || row.bizType || '-') : '任务' }}</template>
       </el-table-column>
-      <el-table-column label="优先级" width="80">
+      <el-table-column label="优先级" min-width="88">
         <template #default="{ row }">{{ row._source === 'todo' ? (priorityMap[row.priority] || '-') : '-' }}</template>
       </el-table-column>
-      <el-table-column label="截止/计划日期" width="120">
+      <el-table-column label="截止/计划日期" min-width="132">
         <template #default="{ row }">{{ row._source === 'todo' ? row.dueDate : row.planEnd }}</template>
       </el-table-column>
-      <el-table-column label="状态" width="90">
+      <el-table-column label="状态" min-width="84">
         <template #default="{ row }">{{ row._source === 'todo' ? (statusMap[row.status] || row.status) : (taskStatusMap[row.status] || row.status) }}</template>
       </el-table-column>
       <el-table-column label="操作" width="100" fixed="right" align="center">

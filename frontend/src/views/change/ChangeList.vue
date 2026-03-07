@@ -6,17 +6,17 @@
       <el-button v-if="isAdmin" type="primary" @click="openForm()">新增</el-button>
     </template>
     <el-table v-loading="loading" :data="list" stripe>
-      <el-table-column label="标题" min-width="160">
+      <el-table-column label="标题" min-width="160" show-overflow-tooltip>
         <template #default="{ row }">
           <span class="link-name" @click="openForm(row)">{{ row.title || '-' }}</span>
         </template>
       </el-table-column>
-      <el-table-column prop="projectId" label="项目ID" width="90" />
-      <el-table-column prop="changeType" label="类型" width="100" />
-      <el-table-column label="状态" width="90">
+      <el-table-column prop="projectId" label="项目ID" min-width="80" />
+      <el-table-column prop="changeType" label="类型" min-width="80" />
+      <el-table-column label="状态" min-width="84">
         <template #default="{ row }">{{ changeStatusMap[row?.status] ?? row?.status ?? '-' }}</template>
       </el-table-column>
-      <el-table-column prop="createdAt" label="创建时间" width="170" />
+      <el-table-column prop="createdAt" label="创建时间" min-width="140" />
       <el-table-column v-if="isAdmin" label="操作" width="90" fixed="right" align="center">
         <template #default="{ row }">
           <div class="table-actions-cell">

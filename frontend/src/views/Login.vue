@@ -142,8 +142,9 @@ async function onSubmit() {
 }
 .login-header { text-align: center; margin-bottom: 36px; }
 .login-header h1 {
-  font-size: 1.85rem;
-  font-weight: 700;
+  font-size: var(--text-xl);
+  font-weight: var(--font-weight-bold);
+  line-height: var(--leading-tight);
   margin-bottom: 10px;
   letter-spacing: 0.04em;
   color: #000;
@@ -152,7 +153,7 @@ async function onSubmit() {
   -webkit-text-fill-color: #000;
   background-clip: unset;
 }
-.login-desc { font-size: 0.875rem; color: #262626; letter-spacing: 0.02em; }
+.login-desc { font-size: var(--text-sm); color: var(--neutral-800); letter-spacing: var(--tracking-normal); line-height: var(--leading-normal); }
 .form :deep(.el-form-item) { margin-bottom: 20px; }
 .form :deep(.el-form-item:last-child) { margin-bottom: 0; margin-top: 12px; }
 /* 登录页输入框：科技感描边，聚焦青紫光晕 */
@@ -187,9 +188,9 @@ async function onSubmit() {
   min-height: 46px !important;
   height: 46px !important;
   padding: 0 20px !important;
-  font-size: 1rem !important;
-  font-weight: 600 !important;
-  border-radius: 10px !important;
+  font-size: var(--text-base) !important;
+  font-weight: var(--font-weight-semibold) !important;
+  border-radius: var(--radius-md) !important;
   color: #ffffff !important;
   text-shadow: none !important;
   background: linear-gradient(90deg, #00d4ff 0%, #6366f1 50%, #a855f7 100%) !important;

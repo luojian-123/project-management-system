@@ -31,6 +31,7 @@
             </div>
             <div class="org-tree-content">
             <el-tree
+              ref="orgTreeRef"
               :key="'tree-expand-' + treeExpandAll"
               class="org-tree"
               :data="treeData"
@@ -44,11 +45,17 @@
             >
               <template #default="{ node, data }">
                 <span class="org-tree-node">
-                  <span class="org-tree-node__icon-wrap" :class="`org-tree-node__icon-wrap--${data.type || 'node'}`">
+                  <span
+                    class="org-tree-node__icon-wrap"
+                    :class="[
+                      `org-tree-node__icon-wrap--${data.type || 'node'}`,
+                      data.type === 'company' && data.label === '系统公司' ? 'org-tree-node__icon-wrap--company-system' : ''
+                    ]"
+                  >
                     <el-icon class="org-tree-node__icon">
                       <OfficeBuilding v-if="data.type === 'company'" />
-                      <Folder v-else-if="data.type === 'dept'" />
-                      <Key v-else-if="data.type === 'role'" />
+                      <Grid v-else-if="data.type === 'dept'" />
+                      <Avatar v-else-if="data.type === 'role'" />
                       <User v-else-if="data.type === 'user'" />
                       <FolderOpened v-else />
                     </el-icon>
@@ -91,7 +98,7 @@
                 <el-table :data="rolePermissionList" stripe max-height="100%" size="small">
                   <el-table-column prop="name" label="菜单名称" min-width="140" />
                   <el-table-column prop="path" label="路径" min-width="120" />
-                  <el-table-column prop="assigned" label="已授权" width="80" align="center">
+                  <el-table-column prop="assigned" label="已授权" min-width="72" align="center">
                     <template #default="{ row }">{{ row.assigned ? '是' : '否' }}</template>
                   </el-table-column>
                 </el-table>
@@ -112,14 +119,14 @@
         </el-col>
         <el-col :xs="12" :sm="12" :md="6">
           <div class="org-lib-card org-lib-card--dept" @click="openDeptLib">
-            <el-icon class="org-lib-card__icon"><Folder /></el-icon>
+            <el-icon class="org-lib-card__icon"><Grid /></el-icon>
             <div class="org-lib-card__num">{{ libraryCounts.dept }}</div>
             <div class="org-lib-card__title">部门库</div>
           </div>
         </el-col>
         <el-col :xs="12" :sm="12" :md="6">
           <div class="org-lib-card org-lib-card--role" @click="openRoleLib">
-            <el-icon class="org-lib-card__icon"><Key /></el-icon>
+            <el-icon class="org-lib-card__icon"><Avatar /></el-icon>
             <div class="org-lib-card__num">{{ libraryCounts.role }}</div>
             <div class="org-lib-card__title">角色库</div>
           </div>
@@ -147,15 +154,27 @@
         <el-button type="primary" size="small" @click="openCompanyForm(); companyLibVisible = false">新增公司</el-button>
       </div>
       <el-table :data="companyList" stripe max-height="100%" class="org-lib-table">
-        <el-table-column prop="companyCode" label="公司编码" width="120" />
-        <el-table-column prop="companyName" label="公司名称" min-width="140" />
-        <el-table-column prop="sortOrder" label="排序" width="88" align="center" min-width="72" />
-        <el-table-column v-if="isAdmin" label="操作" width="140" min-width="140" align="center" fixed="right">
+        <el-table-column prop="companyCode" label="公司编码" min-width="100" />
+        <el-table-column label="公司名称" min-width="140" show-overflow-tooltip>
           <template #default="{ row }">
-            <div class="org-lib-drawer__actions table-actions-cell">
-              <el-button type="primary" link size="small" @click="openCompanyForm(row.id); companyLibVisible = false">编辑</el-button>
-              <el-button type="danger" link size="small" @click="handleCompanyLibDelete(row)">删除</el-button>
-            </div>
+            {{ row.companyName || '-' }}
+            <el-tag v-if="row.isSystem" type="info" size="small" style="margin-left:6px">系统</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="sortOrder" label="排序" min-width="72" align="center" />
+        <el-table-column v-if="isAdmin" label="操作" width="90" align="center" fixed="right">
+          <template #default="{ row }">
+            <el-dropdown trigger="click" :disabled="!!row.isSystem" @command="(cmd) => { if (cmd === 'edit') { openCompanyForm(row.id); companyLibVisible = false } else if (cmd === 'del') handleCompanyLibDelete(row) }">
+              <el-button type="primary" link size="small" :disabled="!!row.isSystem">
+                操作 <el-icon class="el-icon--right"><ArrowDown /></el-icon>
+              </el-button>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item command="edit" :disabled="!!row.isSystem">编辑</el-dropdown-item>
+                  <el-dropdown-item v-if="!row.isSystem" command="del" divided>删除</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
           </template>
         </el-table-column>
       </el-table>
@@ -170,16 +189,28 @@
         <el-button type="primary" size="small" @click="openDeptForm(null, null); deptLibVisible = false">新增部门</el-button>
       </div>
       <el-table :data="deptOptionsWithCompanyName" stripe max-height="100%" class="org-lib-table">
-        <el-table-column prop="companyName" label="所属公司" width="120" />
-        <el-table-column prop="deptCode" label="部门编码" width="110" />
-        <el-table-column prop="deptName" label="部门名称" min-width="120" />
-        <el-table-column prop="sortOrder" label="排序" width="76" align="center" min-width="64" />
-        <el-table-column v-if="isAdmin" label="操作" width="140" min-width="140" align="center" fixed="right">
+        <el-table-column prop="companyName" label="所属公司" min-width="100" />
+        <el-table-column prop="deptCode" label="部门编码" min-width="100" />
+        <el-table-column label="部门名称" min-width="120" show-overflow-tooltip>
           <template #default="{ row }">
-            <div class="org-lib-drawer__actions table-actions-cell">
-              <el-button type="primary" link size="small" @click="openDeptForm(row.id, row.companyId); deptLibVisible = false">编辑</el-button>
-              <el-button type="danger" link size="small" @click="handleDeptLibDelete(row)">删除</el-button>
-            </div>
+            {{ row.deptName || '-' }}
+            <el-tag v-if="row.isSystem" type="info" size="small" style="margin-left:6px">系统</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="sortOrder" label="排序" min-width="64" align="center" />
+        <el-table-column v-if="isAdmin" label="操作" width="90" align="center" fixed="right">
+          <template #default="{ row }">
+            <el-dropdown trigger="click" :disabled="!!row.isSystem" @command="(cmd) => { if (cmd === 'edit') { openDeptForm(row.id, row.companyId); deptLibVisible = false } else if (cmd === 'del') handleDeptLibDelete(row) }">
+              <el-button type="primary" link size="small" :disabled="!!row.isSystem">
+                操作 <el-icon class="el-icon--right"><ArrowDown /></el-icon>
+              </el-button>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item command="edit" :disabled="!!row.isSystem">编辑</el-dropdown-item>
+                  <el-dropdown-item v-if="!row.isSystem" command="del" divided>删除</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
           </template>
         </el-table-column>
       </el-table>
@@ -194,21 +225,33 @@
         <el-button type="primary" size="small" @click="openRoleForm(null, []); roleLibVisible = false">新增角色</el-button>
       </div>
       <el-table v-loading="roleLibLoading" :data="roleListData" stripe max-height="100%" class="org-lib-table">
-        <el-table-column prop="code" label="角色编码" width="100" />
-        <el-table-column prop="name" label="角色名称" width="100" />
-        <el-table-column label="所属部门" min-width="140">
+        <el-table-column prop="code" label="角色编码" min-width="90" />
+        <el-table-column prop="name" label="角色名称" min-width="100" />
+        <el-table-column label="所属部门" min-width="140" show-overflow-tooltip>
           <template #default="{ row }">{{ formatRoleDepts(row.deptIds) }}</template>
         </el-table-column>
-        <el-table-column label="状态" width="76" align="center" min-width="72">
+        <el-table-column label="状态" min-width="72" align="center">
           <template #default="{ row }">{{ row.status === 1 ? '启用' : '禁用' }}</template>
         </el-table-column>
-        <el-table-column prop="sortOrder" label="排序" width="76" align="center" min-width="64" />
-        <el-table-column v-if="isAdmin" label="操作" width="140" min-width="140" align="center" fixed="right">
+        <el-table-column prop="sortOrder" label="排序" min-width="64" align="center" />
+        <el-table-column v-if="isAdmin" label="操作" width="90" align="center" fixed="right">
           <template #default="{ row }">
-            <div class="org-lib-drawer__actions table-actions-cell">
-              <el-button type="primary" link size="small" @click="openRoleForm(row.id, row.deptIds); roleLibVisible = false">编辑</el-button>
-              <el-button type="danger" link size="small" @click="handleRoleLibDelete(row)">删除</el-button>
-            </div>
+            <el-dropdown
+              trigger="click"
+              :disabled="row.code === 'ADMIN'"
+              @command="(cmd) => onRoleLibCommand(cmd, row)"
+            >
+              <el-button type="primary" link size="small" :disabled="row.code === 'ADMIN'">
+                操作 <el-icon class="el-icon--right"><ArrowDown /></el-icon>
+              </el-button>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item command="edit" :disabled="row.code === 'ADMIN'">编辑</el-dropdown-item>
+                  <el-dropdown-item command="permission" :disabled="row.code === 'ADMIN'">权限配置</el-dropdown-item>
+                  <el-dropdown-item command="del" divided :disabled="row.code === 'ADMIN'">删除</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
           </template>
         </el-table-column>
       </el-table>
@@ -223,20 +266,31 @@
         <el-button type="primary" size="small" @click="openUserAddForm(); userLibVisible = false">新增用户</el-button>
       </div>
       <el-table v-loading="userLibLoading" :data="userLibList" stripe max-height="400" class="org-lib-table">
-        <el-table-column prop="username" label="用户名" width="100" />
-        <el-table-column prop="realName" label="姓名" width="90" />
-        <el-table-column label="角色" min-width="120">
+        <el-table-column prop="username" label="用户名" min-width="90" />
+        <el-table-column prop="realName" label="姓名" min-width="80" />
+        <el-table-column label="角色" min-width="120" show-overflow-tooltip>
           <template #default="{ row }">{{ formatUserRoles(row) }}</template>
         </el-table-column>
-        <el-table-column label="状态" width="76" align="center">
+        <el-table-column label="状态" min-width="72" align="center">
           <template #default="{ row }">{{ row.status === 1 ? '启用' : '禁用' }}</template>
         </el-table-column>
-        <el-table-column v-if="isAdmin" label="操作" width="140" min-width="140" align="center" fixed="right">
+        <el-table-column v-if="isAdmin" label="操作" width="90" align="center" fixed="right">
           <template #default="{ row }">
-            <div class="org-lib-drawer__actions table-actions-cell">
-              <el-button type="primary" link size="small" @click="openUserEditFormById(row.id); userLibVisible = false">编辑</el-button>
-              <el-button type="danger" link size="small" :disabled="row.username === 'admin'" @click="handleUserLibDelete(row)">删除</el-button>
-            </div>
+            <el-dropdown
+              trigger="click"
+              :disabled="row.username === 'admin'"
+              @command="(cmd) => { if (cmd === 'edit') { openUserEditFormById(row.id); userLibVisible = false } else if (cmd === 'del') handleUserLibDelete(row) }"
+            >
+              <el-button type="primary" link size="small" :disabled="row.username === 'admin'">
+                操作 <el-icon class="el-icon--right"><ArrowDown /></el-icon>
+              </el-button>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item command="edit" :disabled="row.username === 'admin'">编辑</el-dropdown-item>
+                  <el-dropdown-item command="del" divided :disabled="row.username === 'admin'">删除</el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
           </template>
         </el-table-column>
       </el-table>
@@ -257,7 +311,9 @@
   <!-- 公司 -->
   <el-dialog v-model="companyVisible" title="公司" width="520px" @close="companyRef?.resetFields()">
     <el-form ref="companyRef" :model="companyForm" :rules="companyRules" label-width="90px">
-      <el-form-item label="公司编码" prop="companyCode"><el-input v-model="companyForm.companyCode" /></el-form-item>
+      <el-form-item label="公司编码" prop="companyCode">
+        <el-input v-model="companyForm.companyCode" :disabled="!!companyForm.isSystem" placeholder="系统公司编码不可修改" />
+      </el-form-item>
       <el-form-item label="公司名称" prop="companyName"><el-input v-model="companyForm.companyName" /></el-form-item>
       <el-form-item label="排序" prop="sortOrder"><el-input-number v-model="companyForm.sortOrder" :min="0" /></el-form-item>
     </el-form>
@@ -271,11 +327,13 @@
   <el-dialog v-model="deptVisible" title="部门" width="520px" @close="deptRef?.resetFields()">
     <el-form ref="deptRef" :model="deptForm" :rules="deptRules" label-width="90px">
       <el-form-item label="所属公司" prop="companyId">
-        <el-select v-model="deptForm.companyId" style="width:100%" placeholder="选择公司">
+        <el-select v-model="deptForm.companyId" style="width:100%" placeholder="选择公司" :disabled="!!deptForm.isSystem">
           <el-option v-for="c in companyList" :key="c.id ?? c.companyCode ?? ''" :label="c.companyName || c.companyCode || ''" :value="c.id" />
         </el-select>
       </el-form-item>
-      <el-form-item label="部门编码" prop="deptCode"><el-input v-model="deptForm.deptCode" /></el-form-item>
+      <el-form-item label="部门编码" prop="deptCode">
+        <el-input v-model="deptForm.deptCode" :disabled="!!deptForm.isSystem" placeholder="系统部门编码不可修改" />
+      </el-form-item>
       <el-form-item label="部门名称" prop="deptName"><el-input v-model="deptForm.deptName" /></el-form-item>
       <el-form-item label="排序" prop="sortOrder"><el-input-number v-model="deptForm.sortOrder" :min="0" /></el-form-item>
     </el-form>
@@ -287,6 +345,9 @@
 
   <!-- 角色 -->
   <el-dialog v-model="roleVisible" title="角色" width="520px" @close="roleRef?.resetFields()">
+    <el-alert v-if="roleForm.code === 'ADMIN'" type="info" :closable="false" show-icon style="margin-bottom:12px">
+      管理员角色默认绑定系统部门且不可取消，拥有所有权限。
+    </el-alert>
     <el-form ref="roleRef" :model="roleForm" :rules="roleRules" label-width="90px">
       <el-form-item label="所属部门" prop="deptIds">
         <el-select v-model="roleForm.deptIds" multiple collapse-tags collapse-tags-tooltip style="width:100%" placeholder="可多选部门">
@@ -386,9 +447,9 @@
 </template>
 
 <script setup>
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, nextTick, onMounted, reactive, ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { OfficeBuilding, Folder, FolderOpened, Key, User } from '@element-plus/icons-vue'
+import { OfficeBuilding, Folder, FolderOpened, Key, User, Grid, Avatar, ArrowDown } from '@element-plus/icons-vue'
 import { useUserStore } from '@/store/user'
 import * as orgApi from '@/api/org'
 import { roleGet, roleSave, roleUpdate, roleDelete, roleList, roleMenuIds } from '@/api/role'
@@ -398,6 +459,7 @@ import { userPage, userGet, userSave, userUpdate, userDelete, getUserRoleIds, us
 const userStore = useUserStore()
 const isAdmin = computed(() => userStore.username === 'admin')
 
+const orgTreeRef = ref(null)
 const treeData = ref([])
 const currentNode = ref(null)
 const submitLoading = ref(false)
@@ -532,7 +594,32 @@ function openUserEditFormById(userId) {
   }).catch(() => {})
 }
 
+function onRoleLibCommand(cmd, row) {
+  if (row.code === 'ADMIN') return
+  if (cmd === 'edit') {
+    openRoleForm(row.id, row.deptIds)
+    roleLibVisible.value = false
+  } else if (cmd === 'permission') {
+    currentNode.value = { type: 'role', id: row.id, label: row.name || row.code }
+    detailPanelTab.value = 'permission'
+    loadRolePermission()
+    roleLibVisible.value = false
+    // 左侧树定位到该角色节点并展开
+    nextTick(() => {
+      orgTreeRef.value?.setCurrentKey('role_' + row.id)
+      // 若当前未展开全部，先展开以便看到选中角色
+      if (!treeExpandAll.value) treeExpandAll.value = true
+    })
+  } else if (cmd === 'del') {
+    handleRoleLibDelete(row)
+  }
+}
+
 async function handleCompanyLibDelete(row) {
+  if (row.isSystem) {
+    ElMessage.warning('系统公司不能删除')
+    return
+  }
   try {
     await ElMessageBox.confirm(`确定删除公司「${row.companyName || row.companyCode}」？`, '提示', { type: 'warning' })
     await orgApi.companyDelete(row.id)
@@ -545,6 +632,10 @@ async function handleCompanyLibDelete(row) {
 }
 
 async function handleDeptLibDelete(row) {
+  if (row.isSystem) {
+    ElMessage.warning('系统部门不能删除')
+    return
+  }
   try {
     await ElMessageBox.confirm(`确定删除部门「${row.deptName || row.deptCode}」？`, '提示', { type: 'warning' })
     await orgApi.deptDelete(row.id)
@@ -705,14 +796,14 @@ const isCurrentUserAdmin = computed(() => currentUserDetail.value?.username === 
 // 公司表单
 const companyVisible = ref(false)
 const companyRef = ref(null)
-const companyForm = reactive({ id: null, companyCode: '', companyName: '', sortOrder: 0 })
+const companyForm = reactive({ id: null, companyCode: '', companyName: '', sortOrder: 0, isSystem: false })
 const companyRules = {
   companyCode: [{ required: true, message: '请输入公司编码', trigger: 'blur' }],
   companyName: [{ required: true, message: '请输入公司名称', trigger: 'blur' }]
 }
 
 function openCompanyForm(id) {
-  Object.assign(companyForm, { id: id || null, companyCode: '', companyName: '', sortOrder: 0 })
+  Object.assign(companyForm, { id: id || null, companyCode: '', companyName: '', sortOrder: 0, isSystem: false })
   if (id) {
     orgApi.companyGet(id).then(d => Object.assign(companyForm, d || {}))
   }
@@ -744,7 +835,7 @@ async function submitCompany() {
 // 部门表单
 const deptVisible = ref(false)
 const deptRef = ref(null)
-const deptForm = reactive({ id: null, companyId: null, deptCode: '', deptName: '', sortOrder: 0 })
+const deptForm = reactive({ id: null, companyId: null, deptCode: '', deptName: '', sortOrder: 0, isSystem: false })
 const deptRules = {
   companyId: [{ required: true, message: '请选择公司', trigger: 'change' }],
   deptCode: [{ required: true, message: '请输入部门编码', trigger: 'blur' }],
@@ -752,7 +843,7 @@ const deptRules = {
 }
 
 function openDeptForm(id, companyId) {
-  Object.assign(deptForm, { id: id || null, companyId: companyId || null, deptCode: '', deptName: '', sortOrder: 0 })
+  Object.assign(deptForm, { id: id || null, companyId: companyId || null, deptCode: '', deptName: '', sortOrder: 0, isSystem: false })
   if (id) orgApi.deptGet(id).then(d => Object.assign(deptForm, d || {}))
   deptVisible.value = true
 }
@@ -1045,6 +1136,8 @@ async function doDeleteCompany() {
     ElMessage.success('删除成功')
     currentNode.value = null
     await loadTree()
+  } catch (e) {
+    ElMessage.error(e?.response?.data?.message ?? e?.message ?? '删除失败')
   } finally {
     submitLoading.value = false
   }
@@ -1063,6 +1156,8 @@ async function doDeleteDept() {
     ElMessage.success('删除成功')
     currentNode.value = null
     await loadTree()
+  } catch (e) {
+    ElMessage.error(e?.response?.data?.message ?? e?.message ?? '删除失败')
   } finally {
     submitLoading.value = false
   }
@@ -1189,6 +1284,15 @@ onMounted(() => {
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
 }
 .org-tree-node__icon-wrap--company:hover {
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+.org-tree-node__icon-wrap--company-system {
+  background: linear-gradient(155deg, #86efac 0%, #22c55e 45%, #16a34a 100%) !important;
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+}
+.org-tree-node__icon-wrap--company-system:hover {
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
 }
 .org-tree-node__icon-wrap--dept {
